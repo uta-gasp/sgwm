@@ -1,8 +1,8 @@
 const assert = require('assert');
 
-const FixationsRestructuringSettings = require('./../src/fixationsRestructuringSettings');
+const ShortFixationFilterSettings = require('./../src/shortFixationFilterSettings');
 
-describe( 'FixationsRestructuringSettings', () => {
+describe( 'ShortFixationFilterSettings', () => {
     before(() => {
         //localStorage.itemInsertionCallback = (len) => { console.log(`Storage length: ${len}` ); };
     });
@@ -14,7 +14,7 @@ describe( 'FixationsRestructuringSettings', () => {
 
 	describe( '#constructor', () =>  {
 		it( 'should define some values', () =>  {
-			const settings = new FixationsRestructuringSettings();
+			const settings = new ShortFixationFilterSettings();
 			let propCount = 0;
 			for (let p in settings) {
 				propCount += 1;
@@ -25,7 +25,7 @@ describe( 'FixationsRestructuringSettings', () => {
 
 	describe( '#save()', () =>  {
 		it( 'should save something to localStorage', () =>  {
-			const settings = new FixationsRestructuringSettings();
+			const settings = new ShortFixationFilterSettings();
 			settings.mergingDistanceThreshold = 50;
 			settings.save();
 			assert.notEqual( 0, localStorage.length );
@@ -34,7 +34,7 @@ describe( 'FixationsRestructuringSettings', () => {
 
 	describe( '#load()', () =>  {
 		it( 'should retrieve saved values from localStorage', () =>  {
-			const settings = new FixationsRestructuringSettings();
+			const settings = new ShortFixationFilterSettings();
 			assert.equal( 50, settings.mergingDistanceThreshold );
 		});
 	});

@@ -1,8 +1,8 @@
 const Settings = require('./settings');
 
-class FixationsRestructuringSettings extends Settings {
+class ShortFixationFilterSettings extends Settings {
 	constructor() {
-		super( 'fixationsRestructurer' );
+		super( 'shortFixationFilter' );
 		this._enabled = false;
 		this._mergingDistanceThreshold = 40;
 		this._mergingDurationThreshold = 100;
@@ -21,4 +21,4 @@ class FixationsRestructuringSettings extends Settings {
 	set removingDurationThreshold( value ) { this._removingDurationThreshold = value; }
 };
 
-module.exports = FixationsRestructuringSettings;
+module.exports = ShortFixationFilterSettings;

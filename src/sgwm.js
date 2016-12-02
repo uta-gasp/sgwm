@@ -1,14 +1,21 @@
 const regression = require('./regression.js');
 const logger = require('./logger.js').Logger;
 
-const restructFixations = require('./restructFixations');
+const shortFixationFilter = require('./shortFixationFilter');
 
 class SGWM {
 	constructor() {
 	}
 
-    map() {
+	// Arguments:
+	//	data ({fixations, words})
+    map( data ) {
+        if (!data.fixations || !data.words) {
+            return;
+        }
 
+    	data.fixations = farFixationFilter( data.fixations );
+    	data.fixations = shortFixationFilter( data.fixations );
     }
 }
 
