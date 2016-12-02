@@ -26,8 +26,8 @@ describe( 'shortFixationFilter', () => {
 	    	{x: 200, y: 100, duration: 400},
 	    ];
 
-	    const restructured = shortFixationFilter( fixations );
-	    assert.deepEqual( fixations, restructured )
+	    const filtered = shortFixationFilter( fixations );
+	    assert.deepEqual( fixations, filtered )
 	});
 
 	it( 'should join the first to the second', () =>  {
@@ -37,10 +37,10 @@ describe( 'shortFixationFilter', () => {
 	    	{x: 200, y: 100, duration: 400},
 	    ];
 
-	    const restructured = shortFixationFilter( fixations );
-	    assert.equal( restructured.length, fixations.length - 1 );
-	    assert.equal( restructured[0].duration, fixations[0].duration + fixations[1].duration );
-	    assert.deepEqual( restructured[1], fixations[2] );
+	    const filtered = shortFixationFilter( fixations );
+	    assert.equal( filtered.length, fixations.length - 1 );
+	    assert.equal( filtered[0].duration, fixations[0].duration + fixations[1].duration );
+	    assert.deepEqual( filtered[1], fixations[2] );
 	});
 
 	it( 'should remove first', () =>  {
@@ -50,10 +50,10 @@ describe( 'shortFixationFilter', () => {
 	    	{x: 200, y: 100, duration: 400},
 	    ];
 
-	    const restructured = shortFixationFilter( fixations );
-	    assert.equal( restructured.length, fixations.length - 1 );
-	    assert.deepEqual( restructured[0], fixations[1] );
-	    assert.deepEqual( restructured[1], fixations[2] );
+	    const filtered = shortFixationFilter( fixations );
+	    assert.equal( filtered.length, fixations.length - 1 );
+	    assert.deepEqual( filtered[0], fixations[1] );
+	    assert.deepEqual( filtered[1], fixations[2] );
 	});
 
 	it( 'should join second to the third', () =>  {
@@ -63,10 +63,10 @@ describe( 'shortFixationFilter', () => {
 	    	{x: 200, y: 100, duration: 400},
 	    ];
 
-	    const restructured = shortFixationFilter( fixations );
-	    assert.equal( restructured.length, fixations.length - 1 );
-	    assert.equal( restructured[1].duration, fixations[1].duration + fixations[2].duration );
-	    assert.deepEqual( restructured[0], fixations[0] );
+	    const filtered = shortFixationFilter( fixations );
+	    assert.equal( filtered.length, fixations.length - 1 );
+	    assert.equal( filtered[1].duration, fixations[1].duration + fixations[2].duration );
+	    assert.deepEqual( filtered[0], fixations[0] );
 	});
 
 	it( 'should join third to the second', () =>  {
@@ -76,10 +76,10 @@ describe( 'shortFixationFilter', () => {
 	    	{x: 200, y: 100, duration: 100},
 	    ];
 
-	    const restructured = shortFixationFilter( fixations );
-	    assert.equal( restructured.length, fixations.length - 1 );
-	    assert.equal( restructured[1].duration, fixations[1].duration + fixations[2].duration );
-	    assert.deepEqual( restructured[0], fixations[0] );
+	    const filtered = shortFixationFilter( fixations );
+	    assert.equal( filtered.length, fixations.length - 1 );
+	    assert.equal( filtered[1].duration, fixations[1].duration + fixations[2].duration );
+	    assert.deepEqual( filtered[0], fixations[0] );
 	});
 
 	it( 'should remove the last', () =>  {
@@ -89,10 +89,10 @@ describe( 'shortFixationFilter', () => {
 	    	{x: 200, y: 100, duration: 100},
 	    ];
 
-	    const restructured = shortFixationFilter( fixations );
-	    assert.equal( restructured.length, fixations.length - 1 );
-	    assert.deepEqual( restructured[0], fixations[0] );
-	    assert.deepEqual( restructured[1], fixations[1] );
+	    const filtered = shortFixationFilter( fixations );
+	    assert.equal( filtered.length, fixations.length - 1 );
+	    assert.deepEqual( filtered[0], fixations[0] );
+	    assert.deepEqual( filtered[1], fixations[1] );
 	});
 });
 

@@ -10,12 +10,21 @@ class SGWM {
 	// Arguments:
 	//	data ({fixations, words})
     map( data ) {
-        if (!data.fixations || !data.words) {
+        let fixations = data.fixations;
+        const words = data.words;
+
+        if (!fixations || !words) {
             return;
         }
 
-    	data.fixations = farFixationFilter( data.fixations );
-    	data.fixations = shortFixationFilter( data.fixations );
+        for (let i = 0; i < fixations.length; i += 1) {
+	        fixation.id = i;
+        }
+
+    	fixations = farFixationFilter( fixations );
+    	fixations = shortFixationFilter( fixations );
+
+    	data.fixations = fixations;
     }
 }
 

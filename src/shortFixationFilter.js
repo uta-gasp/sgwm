@@ -80,8 +80,8 @@ const joinOrDeleteShortFixations = (fixations) => {
 // Arguments:
 //	 fixations (Array of {x, y, duration})
 // Returns
-//	 array of same fixations, but some are dropped and some are modified
-//	 (the modified are marked with "merged")
+//	 new array of copied fixations if enabled, same array otherwise
+//	 (the merged fixations have "merged = <Number>")
 module.exports = function( fixations ) {
 	settings.load();
 
