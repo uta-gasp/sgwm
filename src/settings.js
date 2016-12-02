@@ -2,12 +2,18 @@
 	Base class for settings
 */
 class Settings {
-	constructor() {
+	constructor( name ) {
+		this._name = name;
 	}
 
 	load() {
+		const hiddenProps = Object.keys(new Settings(''));
+
 		for (const p in this) {
-			const value = JSON.parse( localStorage.getItem( p ) );
+			if (hiddenProps.indexOf( p ) > -1) {
+				continue;
+			}
+			const value = JSON.parse( localStorage.getItem( this._name + '_' + p ) );
 			if (value !== null) {
 				this[p] = value;
 			}
@@ -15,8 +21,13 @@ class Settings {
 	}
 
 	save() {
+		const hiddenProps = Object.keys(new Settings(''));
+
 		for (const p in this) {
-			localStorage.setItem( p, JSON.stringify( this[p] ) );
+			if (hiddenProps.indexOf( p ) > -1) {
+				continue;
+			}
+			localStorage.setItem( this._name + '_' + p, JSON.stringify( this[p] ) );
 		}
 	}
 }

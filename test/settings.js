@@ -12,17 +12,6 @@ describe( 'Settings', () => {
         localStorage.itemInsertionCallback = null;
     });
 
-	describe( '#constructor', () =>  {
-		it( 'should be empty', () =>  {
-			const settings = new Settings();
-			let propCount = 0;
-			for (let p in settings) {
-				propCount += 1;
-			}
-			assert.equal( 0, propCount );
-		});
-	});
-
 	describe( '#save()', () =>  {
 		it( 'should not save anything to localStorage', () =>  {
 			const settings = new Settings();

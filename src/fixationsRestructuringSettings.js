@@ -2,10 +2,10 @@ const Settings = require('./settings');
 
 class FixationsRestructuringSettings extends Settings {
 	constructor() {
-		super();
+		super( 'fixationsRestructurer' );
 		this._enabled = false;
 		this._mergingDistanceThreshold = 40;
-		this._removingDurationThreshold = 100;
+		this._mergingDurationThreshold = 100;
 		this._removingDurationThreshold = 80;
 
 		super.load();

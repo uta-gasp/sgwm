@@ -16,33 +16,51 @@ const join = (a, b) => {
     a.x = (a.x * a.duration + b.x * b.duration) / totalDuration;
     a.y = (a.y * a.duration + b.y * b.duration) / totalDuration;
     a.duration = totalDuration;
-    a.merged = true;
+    a.merged = (a.merged || 1) + (b.merged || 1);
+    return a;
 };
 
-// Cycle al fixations and joins or deletes too short
+// Tries to join or remove the previous fixation
+// Arguments:
+//		prev (Fixation)
+//		fixation (Fixation)
+//		next (Fixation)
+// Returns
+//		true if the fixation was joined or should be removed
+const joinOrDeleteShortFixation = (fixation, prev, next) => {
+    const distToPrev = prev ? dist( fixation, prev ) : Number.MAX_VALUE;
+    const distToNext = next ? dist( fixation, next ) : Number.MAX_VALUE;
+    if (distToPrev < settings.mergingDistanceThreshold || distToNext < settings.mergingDistanceThreshold) {
+        if (distToNext < distToPrev) {
+            join( next, fixation );
+        }
+        else {
+            join( prev, fixation );
+        }
+        return true;
+    }
+    else if (fixation.duration < settings.removingDurationThreshold) {
+        return true;
+    }
+
+    return false;
+}
+
+// Cycle all fixations and joins or deletes too short
+// Returns
+//		array of newly created objects
 const joinOrDeleteShortFixations = (fixations) => {
     const result = [];
 
     let prevFix, prevPrevFix;
     for (let i = 0; i < fixations.length; i += 1) {
-        const fixation = fixations[i];
+        let fixation = Object.assign( {}, fixations[i] );
+
         if (prevFix && prevFix.duration < settings.mergingDurationThreshold ) {
-            const distToPrev = prevPrevFix ? dist( prevFix, prevPrevFix ) : Number.MAX_VALUE;
-            const distToNext = dist( prevFix, fixation );
-            if (distToPrev < settings.mergingDistanceThreshold || distToNext < settings.mergingDistanceThreshold) {
-                if (distToNext < distToPrev) {
-                    join( fixation, prevFix );
-                }
-                else {
-                    join( prevPrevFix, prevFix );
-                }
-                result.pop();
-                prevFix = prevPrevFix;
-            }
-            else if (prevFix.duration < settings.removingDurationThreshold) {
-                result.pop();
-                prevFix = prevPrevFix;
-            }
+        	if (joinOrDeleteShortFixation( prevFix, prevPrevFix, fixation )) {
+		        result.pop();
+		        prevFix = prevPrevFix;
+        	}
         }
 
         result.push( fixation );
@@ -50,6 +68,12 @@ const joinOrDeleteShortFixations = (fixations) => {
         prevPrevFix = prevFix;
         prevFix = fixation;
     }
+
+	if (prevFix.duration < settings.mergingDurationThreshold &&
+			joinOrDeleteShortFixation( prevFix, prevPrevFix, null )) {
+		result.pop();
+	}
+
     return result;
 };
 
