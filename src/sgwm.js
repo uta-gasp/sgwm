@@ -1,14 +1,20 @@
 const regression = require('./regression.js');
 const logger = require('./logger.js').Logger;
 
+const farFixationFilter = require('./farFixationFilter');
 const shortFixationFilter = require('./shortFixationFilter');
+const splitToProgressions = require('./splitToProgressions');
+const Text = require('./text');
 
 class SGWM {
 	constructor() {
 	}
 
 	// Arguments:
-	//	data ({fixations, words})
+	//	data ({
+	//		fixations: Array of {x, y, duration},
+	//		words: Aarray of {}
+	//	})
     map( data ) {
         let fixations = data.fixations;
         const words = data.words;
@@ -23,6 +29,10 @@ class SGWM {
 
     	fixations = farFixationFilter( fixations );
     	fixations = shortFixationFilter( fixations );
+
+    	const text = new Text( data.words );
+
+    	const progressions = splitToProgressions( fixations, text.lineHeight );
 
     	data.fixations = fixations;
     }
