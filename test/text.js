@@ -25,6 +25,10 @@ describe( 'Text', () => {
 
 		const text = new Text( words );
 		assert.equal( 3, text.lines.length );
+
+		words[4].id = 4;
+		assert.deepEqual( words[4], text.lines[1][1] );
+
 		assert.deepEqual( text.box, {
         	left: 100,
         	top: 100,
