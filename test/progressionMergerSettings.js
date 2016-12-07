@@ -26,7 +26,7 @@ describe( 'ProgressionMergerSettings', () => {
 	describe( '#save()', () =>  {
 		it( 'should save something to localStorage', () =>  {
 			const settings = new ProgressionMergerSettings();
-			settings.longSetLengthThreshold = 4;
+			settings.minLongSetLength = 4;
 			settings.fitThreshold = 0.9;
 			settings.save();
 			assert.notEqual( 0, localStorage.length );
@@ -36,7 +36,7 @@ describe( 'ProgressionMergerSettings', () => {
 	describe( '#load()', () =>  {
 		it( 'should retrieve saved values from localStorage', () =>  {
 			const settings = new ProgressionMergerSettings();
-			assert.equal( 4, settings.longSetLengthThreshold );
+			assert.equal( 4, settings.minLongSetLength );
 			assert.equal( 0.9, settings.fitThreshold );
 		});
 	});

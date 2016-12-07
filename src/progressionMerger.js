@@ -14,16 +14,23 @@ const SET_TYPE = {
 };
 
 let fitThreshold;
+let logger = {
+    log: function() {} // Function( module, ...messages )
+};
 
 class ProgressionMerger {
-    constructor( interLineDistance ) {
+    constructor( interLineDistance, logger_ ) {
         settings.load();
         settings.fitThreshold *= interLineDistance;
+
+        if (logger_) {
+            logger = logger_;
+        }
 
         this.debug = {
             joinSetsOfType: joinSetsOfType,
             createPairs: createPairs,
-            findAndJoinNearests: findAndJoinNearests,
+            findAndJoinClosestPair: findAndJoinClosestPair,
         };
     }
 
@@ -31,39 +38,52 @@ class ProgressionMerger {
     //   progressions (Array of (Array of Fixation))
     //   lineCount (Integer): number of text lines
     merge( progressions, lineCount ) {
-        let result;
+        let result = progressions.map( set => set );
+        logger.log( '#0:', result.length );
 
-        // join only long sets
-        result = joinSetsOfType( progressions, lineCount, SET_TYPE.LONG );
+        // 1. join only long sets
+        result = joinSetsOfType( result, lineCount, SET_TYPE.LONG, SET_TYPE.LONG, settings.minLongSetLength );
+        logger.log( '#1a:', result.length );
 
-        // join short sets with long sets
-        result = joinSetsOfType( result, lineCount, SET_TYPE.SHORT );
+        // 2. join short sets with long sets
+        result = joinSetsOfType( result, lineCount, SET_TYPE.SHORT, SET_TYPE.LONG, settings.minLongSetLength );
+        logger.log( '#1b:', result.length );
 
-        // join the remained single-fixation sets with short sets
-        result = joinSetsOfType( result, lineCount, SET_TYPE.SHORT, 2 );
+        // 3. join the remaining single-fixation sets with multi-fixation sets
+        const multiFixationSetLength = 2;
+        result = joinSetsOfType( result, lineCount, SET_TYPE.SHORT, SET_TYPE.LONG, multiFixationSetLength );
+        logger.log( '#1c:', result.length );
 
         if (result.length > lineCount) {
-            // still too many: join the short sets with any other sets
-            result = joinSetsOfType( result, lineCount, SET_TYPE.LONG, 2, SET_TYPE.LONG );
+            // still too many: join any multi-fixation set with any other multi-fixation set
+            result = joinSetsOfType( result, lineCount, SET_TYPE.LONG, SET_TYPE.LONG, multiFixationSetLength );
+            logger.log( '#2:', result.length );
+        }
+        else if (settings.removeSingleFixationLines) {
+            result = dropShortSets( result, 2 );
         }
 
         if (result.length > lineCount) {
-            // and still too many... drop shortest sets and try joining the closest ones
-            // until we get the right number
-            result = dropShortSets( result );
-            result = joinSetsOfType( result, lineCount, SET_TYPE.LONG, 1, SET_TYPE.LONG, true );
+            // and still too many...
+            // drop short sets
+            result = dropShortSets( result, settings.minLongSetLength );
+            logger.log( '#3a:', result.length );
+
+            // then force joining the closest sets
+            result = joinSetsOfType( result, lineCount, SET_TYPE.ANY, SET_TYPE.ANY, 1, true );
+            logger.log( '#3b:', result.length );
         }
 
         return result;
     }
 }
 
-function joinSetsOfType( fixationsSets, lineCount, setLengthType, longSetThreshold, joiningLengthType, forced ) {
+function joinSetsOfType( fixationsSets, lineCount, primarySetType, secondarySetType, minLongSetLength, forced ) {
     let result = fixationsSets;
 
     while (result.length > lineCount) {
-        const pairs = createPairs( result, setLengthType, longSetThreshold, joiningLengthType );
-        const updatedSets = findAndJoinNearests( result, pairs, forced );
+        const pairs = createPairs( result, primarySetType, secondarySetType, minLongSetLength );
+        const updatedSets = findAndJoinClosestPair( result, pairs, forced );
 
         if (!updatedSets) {
             break;
@@ -125,14 +145,11 @@ function getJoinedPairFitError( set1, set2 ) {
     return Math.sqrt( error / fixations.length );
 }
 
-function createPairs( fixationsSets, setLengthType, longSetThreshold, joiningLengthType = SET_TYPE.LONG) {
-    // ensure the threshold is a valid value
-    longSetThreshold = longSetThreshold || settings.longSetLengthThreshold;
-
+function createPairs( fixationsSets, primarySetType, secondarySetType, setSetTypeThreshold) {
     const pairs = [];
     for (let i = 0; i < fixationsSets.length; i += 1) {
         const set1 = fixationsSets[i];
-        if (!isValidSet( set1, setLengthType, longSetThreshold )) {
+        if (!isValidSet( set1, primarySetType, setSetTypeThreshold )) {
             continue;
         }
 
@@ -143,7 +160,7 @@ function createPairs( fixationsSets, setLengthType, longSetThreshold, joiningLen
             }
 
             const set2 = fixationsSets[j];
-            if (!isValidSet( set2, joiningLengthType, longSetThreshold )) {
+            if (!isValidSet( set2, secondarySetType, setSetTypeThreshold )) {
                 continue;
             }
 
@@ -159,7 +176,7 @@ function createPairs( fixationsSets, setLengthType, longSetThreshold, joiningLen
 }
 
 /**********************
-    findAndJoinNearests
+    findAndJoinClosestPair
 **********************/
 
 function joinSets( fixationsSets, id1, id2, forced ) {
@@ -180,14 +197,14 @@ function joinSets( fixationsSets, id1, id2, forced ) {
         fixationsSets.splice( minIndex, 1 );
         fixationsSets.push( joinedSet );
 
-        console.log( 'Joining sets: ', '\n1:\n' ,set1, '\n2:\n', set2 );
+        //console.log( 'Joining sets: ', '\n1:\n' ,set1, '\n2:\n', set2 );
         return true;
     }
 
     return false;
 }
 
-function findAndJoinNearests( fixationsSets, pairs, forced ) {
+function findAndJoinClosestPair( fixationsSets, pairs, forced ) {
     // ensure the arguments have valid values
     fitThreshold = forced ? Number.MAX_VALUE : settings.fitThreshold;
 
@@ -214,7 +231,7 @@ function findAndJoinNearests( fixationsSets, pairs, forced ) {
         // if found, try to join them
         if (minIndex >= 0 && minError < fitThreshold) {
             const pair = pairs[ minIndex ];
-            console.log( 'best pair:', pair );
+            //console.log( 'best pair:', pair );
             const success = joinSets( fixationsSets, pair.set1, pair.set2, forced );
             if (success) {
                 result = fixationsSets;
@@ -236,17 +253,16 @@ function findAndJoinNearests( fixationsSets, pairs, forced ) {
     return result;
 }
 
-function dropShortSets( fixationSets ) {
-    if (settings.shortProgressionThreshold < 1) {
-        return fixationSets;
-    }
-
+function dropShortSets( fixationSets, minLength ) {
     var result = [];
 
     for (var i = 0; i < fixationSets.length; i += 1) {
         var fixationSet = fixationSets[i];
-        if (fixationSet.length > settings.shortProgressionThreshold) {
+        if (fixationSet.length >= minLength) {
             result.push( fixationSet );
+        }
+        else {
+            fixationSet.removed = true;
         }
     }
 
