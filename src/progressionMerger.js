@@ -13,15 +13,19 @@ const SET_TYPE = {
     ANY: 3
 };
 
-let fitThreshold;
 let logger = {
     log: function() {} // Function( module, ...messages )
 };
 
 class ProgressionMerger {
-    constructor( interLineDistance, logger_ ) {
+    // Arguments:
+    //   interlineDistance (Number): inter-line distance in pixels
+    //   logger_ ({ log(...) }): optional logger
+    constructor( interlineDistance, logger_ ) {
         settings.load();
-        settings.fitThreshold *= interLineDistance;
+        settings.fitThreshold *= interlineDistance;
+
+        this._interlineDistance = interlineDistance;
 
         if (logger_) {
             logger = logger_;
@@ -37,6 +41,12 @@ class ProgressionMerger {
     // Arguments:
     //   progressions (Array of (Array of Fixation))
     //   lineCount (Integer): number of text lines
+    // Returns:
+    //   new array of orininal and merged progressions (Array of (Array of Fixation))
+    //   (merged sets have property "joined = <numberOfJoinedProgressions>")
+    //   (progressions not included in the resulting array and not merged with other have property "removed")
+    // Notes:
+    //   1. Fixations get property "line", the index of line they land onto.
     merge( progressions, lineCount ) {
         let result = progressions.map( set => set );
         logger.log( '#0:', result.length );
@@ -73,6 +83,12 @@ class ProgressionMerger {
             result = joinSetsOfType( result, lineCount, SET_TYPE.ANY, SET_TYPE.ANY, 1, true );
             logger.log( '#3b:', result.length );
         }
+
+        result.sort( (a, b) => {
+            return avgY( a ) - avgY( b );
+        });
+
+        align( result, this._interlineDistance );
 
         return result;
     }
@@ -185,6 +201,7 @@ function joinSets( fixationsSets, id1, id2, forced ) {
     const set1 = fixationsSets[ id1 ];
     const set2 = fixationsSets[ id2 ];
     const joinedSet = set1.concat( set2 );
+    joinedSet.joined = (set1.joined || 1) + (set2.joined || 1);
 
     const model = regression.model( 'linear', fixationsToArray( joinedSet ) );
     const gradient = model.equation[1];
@@ -197,7 +214,7 @@ function joinSets( fixationsSets, id1, id2, forced ) {
         fixationsSets.splice( minIndex, 1 );
         fixationsSets.push( joinedSet );
 
-        //console.log( 'Joining sets: ', '\n1:\n' ,set1, '\n2:\n', set2 );
+        //logger.log( 'Joining sets: ', '\n1:\n', set1, '\n2:\n', set2 );
         return true;
     }
 
@@ -205,10 +222,9 @@ function joinSets( fixationsSets, id1, id2, forced ) {
 }
 
 function findAndJoinClosestPair( fixationsSets, pairs, forced ) {
-    // ensure the arguments have valid values
-    fitThreshold = forced ? Number.MAX_VALUE : settings.fitThreshold;
-
     let result;
+
+    const fitThreshold = forced ? Number.MAX_VALUE : settings.fitThreshold;
 
     // holds pairs that produce too inclined set
     const invalidPairs = {};
@@ -231,7 +247,6 @@ function findAndJoinClosestPair( fixationsSets, pairs, forced ) {
         // if found, try to join them
         if (minIndex >= 0 && minError < fitThreshold) {
             const pair = pairs[ minIndex ];
-            //console.log( 'best pair:', pair );
             const success = joinSets( fixationsSets, pair.set1, pair.set2, forced );
             if (success) {
                 result = fixationsSets;
@@ -245,13 +260,17 @@ function findAndJoinClosestPair( fixationsSets, pairs, forced ) {
         }
 
         // break only when
-        //  - all pairs has too distance component, or
-        //  - all pairs produce too inclined set of fixations, or
-        //  - the pair or the closest sets were joined together
+        //  - all pairs have too distant components, or
+        //  - all pairs have very distinctly inclined set of fixations, or
+        //  - a pair of the closest sets was joined
     } while (result === undefined);
 
     return result;
 }
+
+/**********************
+    [other]
+**********************/
 
 function dropShortSets( fixationSets, minLength ) {
     var result = [];
@@ -269,5 +288,42 @@ function dropShortSets( fixationSets, minLength ) {
     return result;
 }
 
+function avgY( fixations ) {
+    let sumY = 0;
+    for (var i = 0; i < fixations.length; i += 1) {
+        sumY += fixations[i].y;
+    }
+    return sumY / fixations.length;
+}
+
+function align( fixationLines, interlineDistance ) {
+    let currentLineID = 0;
+    let lastLineY = 0;
+
+    const minYDiffForLineCorrection = settings.emptyLineDetectorFactor * interlineDistance;
+
+    for (let i = 0; i < fixationLines.length; i += 1) {
+        const fixations = fixationLines[i];
+        let currentLineY = 0;
+        for (let j = 0; j < fixations.length; j += 1) {
+            currentLineY += fixations[j].y;
+        }
+
+        currentLineY /= fixations.length;
+
+        if (settings.correctForEmptyLines && i > 0 && (currentLineY - lastLineY) > minYDiffForLineCorrection) {
+            const origLineID = currentLineID;
+            currentLineID += Math.round( (currentLineY - lastLineY) / interlineDistance ) - 1;
+            logger.log( `CORR: #${origLineID} => ${currentLineID}` );
+        }
+
+        for (let j = 0; j < fixations.length; j += 1) {
+            fixations[j].line = currentLineID;
+        }
+
+        lastLineY = currentLineY;
+        currentLineID += 1;
+    }
+}
 
 module.exports = ProgressionMerger;

@@ -47,7 +47,7 @@ const tryJoinFixation = (fixation, prev, next) => {
 
 // Cycle all fixations and joins or deletes too short
 // Returns
-//		array of newly created objects
+//		array of newly created fixation objects (Array of Fixation)
 const joinOrDeleteShortFixations = (fixations) => {
     const result = [];
 
@@ -81,7 +81,7 @@ const joinOrDeleteShortFixations = (fixations) => {
 //	 fixations (Array of {x, y, duration})
 // Returns
 //	 new array of copied fixations if enabled, same array otherwise
-//	 (the merged fixations have "merged = <Number>")
+//	 (the merged fixations have "merged = <countOfMergedFixations>")
 module.exports = function( fixations ) {
 	settings.load();
 

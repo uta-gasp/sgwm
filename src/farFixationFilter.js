@@ -10,7 +10,7 @@ const settings = new FarFixationFilterSettings();
 //   fixations (Array of Fixation)
 //   textbox {left, right, top, bottom}
 // Returns
-//   array with non-copied fixations (Array of Fixation)
+//   new array with original fixations (Array of Fixation)
 module.exports = function( fixations, textbox ) {
     settings.load();
 
