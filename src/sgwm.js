@@ -7,6 +7,7 @@ const splitToProgressions = require('./splitToProgressions');
 const Text = require('./text');
 const ProgressionMerger = require('./progressionMerger');
 const fixationAligner = require('./fixationAligner');
+const WordMapper = require('./wordMapper');
 
 class SGWM {
 	constructor() {
@@ -41,6 +42,9 @@ class SGWM {
     	merger.align( fixationLines, text.lines );
 
     	fixationAligner( fixationLines, text.lines );
+
+	    const wordMapper = new WordMapper();
+	    wordMapper.map( fixationLines, text.lines );
 
     	data.fixations = fixations;
     }

@@ -47,7 +47,9 @@ const tryJoinFixation = (fixation, prev, next) => {
 
 // Cycle all fixations and joins or deletes too short
 // Returns
-//		array of newly created fixation objects (Array of Fixation)
+//   array of newly created fixation objects (Array of Fixation)
+// Notes:
+//   not-modified fixations are copied
 const joinOrDeleteShortFixations = (fixations) => {
     const result = [];
 

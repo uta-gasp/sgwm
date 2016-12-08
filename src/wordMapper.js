@@ -165,6 +165,7 @@ function getClosestWordID( fixation, words ) {
         const effectiveWordWidth = word.fixations || word.text.length <= settings.partialLengthMaxWordLength ?
             settings.effectiveLengthFactor * word.width : word.width;
 
+        // BUGFIX: effectiveWordWidth =>> word.x + effectiveWordWidth
         if (fixation.x >= word.x && fixation.x < (word.x + effectiveWordWidth)) {
             minDistWordID = i;
             minDist = 0;
