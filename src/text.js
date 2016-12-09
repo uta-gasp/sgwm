@@ -7,9 +7,10 @@ class Text {
 	//	 words (Array of {x, y, width, height, text, row:optional=<line ID starting form 1>})
     // Notes:
     //   1. each word gets property "id" = <index in the text>
-    //   2. the words are copied
+    //   2. the words in "lines" and "wrods" properties are copied (and shared between these two properties)
 	constructor( words ) {
         const lines = [];
+        const wordList = [];
         const box = {
         	left: Number.MAX_VALUE,
         	top: Number.MAX_VALUE,
@@ -28,6 +29,8 @@ class Text {
         let currentY = Number.MIN_VALUE;
         for (let i = 0; i < words.length; i += 1) {
             const word = Object.assign( {}, words[i] );
+            wordList.push( word );
+
             word.id = i;
             if (word.x < box.left) { box.left = word.x; }
             if (word.y < box.top) { box.top = word.y; }
@@ -45,6 +48,7 @@ class Text {
 
         this._box = box;
         this._lines = lines;
+        this._words = wordList;
 
         const firstLine = lines[0];
         const lastLine = lines[ lines.length - 1 ];
@@ -55,6 +59,7 @@ class Text {
 
 	get box() { return this._box; }
 	get lines() { return this._lines; }
+    get words() { return this._words; }
 	get lineHeight() { return this._lineHeight;	}
     get interlineDistance() { return this._interlineDistance; }
 }

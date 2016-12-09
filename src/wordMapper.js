@@ -44,6 +44,13 @@ class WordMapper {
             }
         }
     }
+
+    // Arguments:
+    //   fixations (Array of Fixation): the list of fixations
+    //   words (Array of Word): the Text.words
+    clean( fixations, words ) {
+        removeTransitions( fixations, words );
+    }
 }
 
 function getTextLine( textLines, lineID ) {
@@ -215,5 +222,83 @@ function mapFixationsWithinLine( fixations, words ) {
     }
 }
 
+/***************
+    removeTransitions
+***************/
+
+function getPrevFixationOnLine( fixations, index ) {
+    let result = null;
+    for (; index > 0; index -= 1) {
+        const fix = fixations[ index ];
+        if (fix.line !== undefined) {
+            result = fix;
+            break;
+        }
+    }
+
+    return result;
+};
+
+function getLastChunkSaccade( fixations, index, direction ) {
+    let result = null;
+    for (; index > 0; index -= 1) {
+        const fix = fixations[ index ];
+        if (fix.line === undefined) {
+            continue;
+        }
+
+        const prevFix = getPrevFixationOnLine( fixations, index - 1 );
+        if (!prevFix) {
+            index = 0;
+            break;
+        }
+
+        if (direction < 0 ? fix.x < prevFix.x : fix.x >= prevFix.x) {
+            result = fix;
+            break;
+        }
+    }
+
+    return [ result, index ];
+};
+
+function removeTransitions( fixations, words ) {
+    let index = fixations.length - 1;
+
+    while (index) {
+        const [ firstProgressionFix, firstProgressionFixIndex ] = getLastChunkSaccade( fixations, index, -1 );
+        if (!firstProgressionFixIndex) {
+            break;
+        }
+
+        const [ lastProgressionFix, lastProgressionFixIndex ] = getLastChunkSaccade( fixations, firstProgressionFixIndex, 1 );
+        index = lastProgressionFixIndex;
+        if (!lastProgressionFix)  {
+            continue;
+        }
+
+        if (firstProgressionFix.line !== lastProgressionFix.line) {
+            for (let i = lastProgressionFixIndex + 1; i < firstProgressionFixIndex; i += 1) {
+                const fix = fixations[ i ];
+                if (fix.word) {
+                    const word = words[ fix.word.id ];
+                    if (word.fixations.length === 1) {
+                        delete word.fixations;
+                        logger.log( 'Mapping removed for word #', word.id );
+                    }
+                    else {
+                        word.fixations = word.fixations.filter( f => f.id !== fix.id );
+                        logger.log( 'One mapping removed for word #', word.id );
+                    }
+
+                    delete fix.word;
+                    delete fix.line;
+
+                    logger.log( 'Mapping removed for fix #', fix.id );
+                }
+            }
+        }
+    }
+}
 
 module.exports = WordMapper;

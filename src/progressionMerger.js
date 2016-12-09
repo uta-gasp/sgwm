@@ -314,7 +314,7 @@ function align( fixationLines, interlineDistance ) {
         if (settings.correctForEmptyLines && i > 0 && (currentLineY - lastLineY) > minYDiffForLineCorrection) {
             const origLineID = currentLineID;
             currentLineID += Math.round( (currentLineY - lastLineY) / interlineDistance ) - 1;
-            logger.log( `CORR: #${origLineID} => ${currentLineID}` );
+            logger.log( `Correction: #${origLineID} => ${currentLineID}` );
         }
 
         for (let j = 0; j < fixations.length; j += 1) {

@@ -7,10 +7,13 @@ const ShortFixationFilterSettings = require('./shortFixationFilterSettings');
 const settings = new ShortFixationFilterSettings();
 
 // Calculated distance between 2 fixations
-const dist = (a, b) => Math.sqrt( Math.pow( a.x - b.x, 2 ) + Math.pow( a.y - b.y, 2 ) );
+function dist( a, b ) {
+    return Math.sqrt( Math.pow( a.x - b.x, 2 ) + Math.pow( a.y - b.y, 2 ) );
+}
 
-// Joins 2 fixations, saves the result to the first fixation and sets its "merged" field to "true"
-const join = (a, b) => {
+// Joins 2 fixations, saves the result to the first fixation,
+// and adds property "merged" = <number of merged fixations>
+function join( a, b ) {
     const totalDuration = a.duration + b.duration;
     a.x = (a.x * a.duration + b.x * b.duration) / totalDuration;
     a.y = (a.y * a.duration + b.y * b.duration) / totalDuration;
@@ -26,7 +29,7 @@ const join = (a, b) => {
 //		next (Fixation)
 // Returns
 //		true if the fixation should be removed
-const tryJoinFixation = (fixation, prev, next) => {
+function tryJoinFixation( fixation, prev, next ) {
     const distToPrev = prev ? dist( fixation, prev ) : Number.MAX_VALUE;
     const distToNext = next ? dist( fixation, next ) : Number.MAX_VALUE;
     if (distToPrev < settings.mergingDistanceThreshold || distToNext < settings.mergingDistanceThreshold) {
@@ -50,7 +53,7 @@ const tryJoinFixation = (fixation, prev, next) => {
 //   array of newly created fixation objects (Array of Fixation)
 // Notes:
 //   not-modified fixations are copied
-const joinOrDeleteShortFixations = (fixations) => {
+function joinOrDeleteShortFixations( fixations ) {
     const result = [];
 
     let prevFix, prevPrevFix;
@@ -83,7 +86,7 @@ const joinOrDeleteShortFixations = (fixations) => {
 //	 fixations (Array of {x, y, duration})
 // Returns
 //	 new array of copied fixations if enabled, same array otherwise
-//	 (the merged fixations have "merged = <countOfMergedFixations>")
+//	 (the merged fixations have property "merged" = <number of merged fixations>)
 module.exports = function( fixations ) {
 	settings.load();
 

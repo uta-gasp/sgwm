@@ -32,4 +32,3 @@ module.exports = function( fixations, textbox ) {
 
     return result;
 }
-

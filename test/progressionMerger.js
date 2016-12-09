@@ -190,7 +190,7 @@ describe( 'ProgressionMerger', () => {
 	    const readingLines = merger.merge( progressions, text.lines.length );
 	    assert.equal( readingLines.length, text.lines.length );
 
-	    logger.log( readingLines );
+	    //logger.log( readingLines );
 	    assert.equal( readingLines[0][0].line, 0 );
 	    assert.equal( readingLines[1][0].line, 2 );
 	    assert.equal( readingLines[2][0].line, 3 );

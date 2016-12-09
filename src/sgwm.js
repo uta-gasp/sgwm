@@ -45,6 +45,7 @@ class SGWM {
 
 	    const wordMapper = new WordMapper();
 	    wordMapper.map( fixationLines, text.lines );
+	    wordMapper.clean( fixations, text.words );
 
     	data.fixations = fixations;
     }

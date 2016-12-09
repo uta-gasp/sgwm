@@ -1,3 +1,8 @@
+/*
+    Marks fixations that are at the end of the progressive reading,
+    i.e. last before the first fixation in the chain of regressive fixations
+*/
+
 function prevMappedFix( fixations, index, step ) {
     let result;
     let passed = 0;
@@ -32,6 +37,10 @@ function nextMappedFix( fixations, index, step ) {
     return result;
 };
 
+// Argument:
+//   fixations (Array of Fixation)
+// Notes:
+//   added "isRegression" property for each fixation that is the last progressive reading fixation
 module.exports = function( fixations ) {
     for (let i = 0; i < fixations.length; i += 1) {
         const fix = fixations[i];
