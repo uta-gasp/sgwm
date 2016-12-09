@@ -6,18 +6,18 @@ const WordMapperSettings = require('./wordMapperSettings');
 
 const settings = new WordMapperSettings();
 
-let logger = {
-    log: function() {} // Function( module, ...messages )
-};
+let log = () => {}; // Function( module, ...messages )
 
 class WordMapper {
     // Arguments:
-    //   logger_ ({ log(...) }): optional logger
-    constructor( logger_ ) {
+    //   logger ({ log(...) }): optional logger
+    constructor( logger ) {
         settings.load();
 
-        if (logger_) {
-            logger = logger_;
+        if (logger) {
+            log = (...params) => {
+                logger.log( 'WordMapper   ', ...params );
+            };
         }
     }
     // Arguments:
@@ -130,9 +130,9 @@ function rescaleFixations( fixations, words ) {
 
     let { leftMostX, rightMostX } = getFixationsRange( fixations );
 
-    logger.log( 'rescaling...' );
-    logger.log( 'left: ' + leftMostX + ' ' + leftThreshold );
-    logger.log( 'right: ' + rightMostX + ' ' + rightThreshold );
+    log( 'rescaling...' );
+    log( 'left: ' + leftMostX + ' ' + leftThreshold );
+    log( 'right: ' + rightMostX + ' ' + rightThreshold );
 
     if (leftMostX < leftThreshold || rightMostX > rightThreshold) {
         // Calculate the scaling factor
@@ -145,7 +145,7 @@ function rescaleFixations( fixations, words ) {
         const newRange = newRightMostX - newLeftMostX;
         const oldRange = rightMostX - leftMostX;
         const { scale, newXCorrection } = computeScale( newRange, oldRange );
-        logger.log( 'scale', scale );
+        log( 'scale', scale );
 
         newLeftMostX -= newXCorrection;
         newRightMostX += newXCorrection;
@@ -191,12 +191,13 @@ function getClosestWordID( fixation, words ) {
 }
 
 function mapFixationsWithinLine( fixations, words ) {
-    logger.log( 'mapping:' );
+    log( '== mapping ==' );
     for (let i = 0; i < fixations.length; i += 1) {
         const fixation = fixations[i];
 
         const closestWordID = getClosestWordID( fixation, words );
         if (closestWordID < 0) {
+            log( `${fixation.id} => ---` );
             continue;
         }
 
@@ -218,7 +219,7 @@ function mapFixationsWithinLine( fixations, words ) {
             closestWord.fixations = [ fixation ];
         }
 
-        logger.log( `${fixation.x} => ${closestWord.x}-${fixation.word.right}` );
+        log( `${fixation.id} => ${closestWord.id}` );
     }
 }
 
@@ -284,17 +285,17 @@ function removeTransitions( fixations, words ) {
                     const word = words[ fix.word.id ];
                     if (word.fixations.length === 1) {
                         delete word.fixations;
-                        logger.log( 'Mapping removed for word #', word.id );
+                        log( 'removed @ word #', word.id );
                     }
                     else {
                         word.fixations = word.fixations.filter( f => f.id !== fix.id );
-                        logger.log( 'One mapping removed for word #', word.id );
+                        log( 'one removed @ word #', word.id );
                     }
 
                     delete fix.word;
                     delete fix.line;
 
-                    logger.log( 'Mapping removed for fix #', fix.id );
+                    log( 'removed @ fix #', fix.id );
                 }
             }
         }

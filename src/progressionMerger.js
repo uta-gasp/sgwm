@@ -13,22 +13,22 @@ const SET_TYPE = {
     ANY: 3
 };
 
-let logger = {
-    log: function() {} // Function( module, ...messages )
-};
+let log = () => {}; // Function( module, ...messages )
 
 class ProgressionMerger {
     // Arguments:
     //   interlineDistance (Number): inter-line distance in pixels
-    //   logger_ ({ log(...) }): optional logger
-    constructor( interlineDistance, logger_ ) {
+    //   logger ({ log(...) }): optional logger
+    constructor( interlineDistance, logger ) {
         settings.load();
         settings.fitThreshold *= interlineDistance;
 
         this._interlineDistance = interlineDistance;
 
-        if (logger_) {
-            logger = logger_;
+        if (logger) {
+            log = (...params) => {
+                logger.log( 'ProgressionMerger   ', ...params );
+            };
         }
 
         this.debug = {
@@ -42,32 +42,32 @@ class ProgressionMerger {
     //   progressions (Array of (Array of Fixation))
     //   lineCount (Integer): number of text lines
     // Returns:
-    //   new array of orininal and merged progressions (Array of (Array of Fixation))
-    //   (merged sets have property "joined = <numberOfJoinedProgressions>")
-    //   (progressions not included in the resulting array and not merged with other have property "removed")
+    //   new sorted array of original and merged progressions (Array of (Array of Fixation))
     // Notes:
     //   1. Fixations get property "line", the index of line they land onto.
+    //   2. Merged sets have property "joined" = <number of joined progressions>
+    //   3. Progressions not included in the resulting array and not merged with other have property "removed"
     merge( progressions, lineCount ) {
         let result = progressions.map( set => set );
-        logger.log( '#0:', result.length );
+        log( '#0:', result.length, '\n', result.map( set => (set.map( fix => fix.id ))) );
 
         // 1. join only long sets
         result = joinSetsOfType( result, lineCount, SET_TYPE.LONG, SET_TYPE.LONG, settings.minLongSetLength );
-        logger.log( '#1a:', result.length );
+        log( '#1a:', result.length );
 
         // 2. join short sets with long sets
         result = joinSetsOfType( result, lineCount, SET_TYPE.SHORT, SET_TYPE.LONG, settings.minLongSetLength );
-        logger.log( '#1b:', result.length );
+        log( '#1b:', result.length );
 
         // 3. join the remaining single-fixation sets with multi-fixation sets
         const multiFixationSetLength = 2;
         result = joinSetsOfType( result, lineCount, SET_TYPE.SHORT, SET_TYPE.LONG, multiFixationSetLength );
-        logger.log( '#1c:', result.length );
+        log( '#1c:', result.length );
 
         if (result.length > lineCount) {
             // still too many: join any multi-fixation set with any other multi-fixation set
             result = joinSetsOfType( result, lineCount, SET_TYPE.LONG, SET_TYPE.LONG, multiFixationSetLength );
-            logger.log( '#2:', result.length );
+            log( '#2:', result.length );
         }
         else if (settings.removeSingleFixationLines) {
             result = dropShortSets( result, 2 );
@@ -77,16 +77,12 @@ class ProgressionMerger {
             // and still too many...
             // drop short sets
             result = dropShortSets( result, settings.minLongSetLength );
-            logger.log( '#3a:', result.length );
+            log( '#3a:', result.length );
 
             // then force joining the closest sets
-            result = joinSetsOfType( result, lineCount, SET_TYPE.ANY, SET_TYPE.ANY, 1, true );
-            logger.log( '#3b:', result.length );
+            result = joinSetsOfType( result, lineCount, SET_TYPE.ANY, SET_TYPE.ANY );
+            log( '#3b:', result.length );
         }
-
-        result.sort( (a, b) => {
-            return avgY( a ) - avgY( b );
-        });
 
         align( result, this._interlineDistance );
 
@@ -94,8 +90,9 @@ class ProgressionMerger {
     }
 }
 
-function joinSetsOfType( fixationsSets, lineCount, primarySetType, secondarySetType, minLongSetLength, forced ) {
+function joinSetsOfType( fixationsSets, lineCount, primarySetType, secondarySetType, minLongSetLength ) {
     let result = fixationsSets;
+    const forced = primarySetType === SET_TYPE.ANY && secondarySetType === SET_TYPE.ANY;
 
     while (result.length > lineCount) {
         const pairs = createPairs( result, primarySetType, secondarySetType, minLongSetLength );
@@ -146,8 +143,7 @@ function fixationsToArray( fixations ) {
     return result;
 }
 
-function getJoinedPairFitError( set1, set2 ) {
-    const fixations = set1.concat( set2 );
+function getFitError( fixations ) {
     const model = regression.model( 'linear', fixationsToArray( fixations ) );
 
     let error = 0;
@@ -163,13 +159,14 @@ function getJoinedPairFitError( set1, set2 ) {
 
 function createPairs( fixationsSets, primarySetType, secondarySetType, setSetTypeThreshold) {
     const pairs = [];
+
     for (let i = 0; i < fixationsSets.length; i += 1) {
         const set1 = fixationsSets[i];
         if (!isValidSet( set1, primarySetType, setSetTypeThreshold )) {
             continue;
         }
 
-        // Compute proximity of each set pair
+        // Compute error of fitting to linear model for each pair of sets
         for (let j = 0; j < fixationsSets.length; j += 1) {
             if (i === j) {
                 continue;
@@ -180,10 +177,12 @@ function createPairs( fixationsSets, primarySetType, secondarySetType, setSetTyp
                 continue;
             }
 
+            const joinedSets = set1.concat( set2 );
+
             pairs.push({
                 set1: i,
                 set2: j,
-                error: getJoinedPairFitError( set1, set2 )
+                error: getFitError( joinedSets )
             });
         }
     }
@@ -214,7 +213,8 @@ function joinSets( fixationsSets, id1, id2, forced ) {
         fixationsSets.splice( minIndex, 1 );
         fixationsSets.push( joinedSet );
 
-        //logger.log( 'Joining sets: ', '\n1:\n', set1, '\n2:\n', set2 );
+        log( 'joined', id1 + ' = ' + set1.map( fix => fix.id), ' & ', id2 + ' = ' + set2.map( fix => fix.id) );
+        log( '--->\n', fixationsSets.map( set => set.map( fix => fix.id ) ) );
         return true;
     }
 
@@ -269,6 +269,53 @@ function findAndJoinClosestPair( fixationsSets, pairs, forced ) {
 }
 
 /**********************
+    align
+**********************/
+function sortLines( fixationLines ) {
+    fixationLines.sort( (line1, line2) => {
+        return avgY( line1 ) - avgY( line2 );
+    });
+    fixationLines.forEach( line => {
+        line.sort( (fix1, fix2) => {
+            return fix1.ts - fix2.ts;
+        });
+    });
+}
+
+function align( fixationLines, interlineDistance ) {
+
+    sortLines( fixationLines );
+
+    let currentLineID = 0;
+    let lastLineY = 0;
+
+    const minYDiffForLineCorrection = settings.emptyLineDetectorFactor * interlineDistance;
+
+    for (let i = 0; i < fixationLines.length; i += 1) {
+        const fixations = fixationLines[i];
+        let currentLineY = 0;
+        for (let j = 0; j < fixations.length; j += 1) {
+            currentLineY += fixations[j].y;
+        }
+
+        currentLineY /= fixations.length;
+
+        if (settings.correctForEmptyLines && i > 0 && (currentLineY - lastLineY) > minYDiffForLineCorrection) {
+            const origLineID = currentLineID;
+            currentLineID += Math.round( (currentLineY - lastLineY) / interlineDistance ) - 1;
+            log( `Correction: #${origLineID} => ${currentLineID}` );
+        }
+
+        for (let j = 0; j < fixations.length; j += 1) {
+            fixations[j].line = currentLineID;
+        }
+
+        lastLineY = currentLineY;
+        currentLineID += 1;
+    }
+}
+
+/**********************
     [other]
 **********************/
 
@@ -294,36 +341,6 @@ function avgY( fixations ) {
         sumY += fixations[i].y;
     }
     return sumY / fixations.length;
-}
-
-function align( fixationLines, interlineDistance ) {
-    let currentLineID = 0;
-    let lastLineY = 0;
-
-    const minYDiffForLineCorrection = settings.emptyLineDetectorFactor * interlineDistance;
-
-    for (let i = 0; i < fixationLines.length; i += 1) {
-        const fixations = fixationLines[i];
-        let currentLineY = 0;
-        for (let j = 0; j < fixations.length; j += 1) {
-            currentLineY += fixations[j].y;
-        }
-
-        currentLineY /= fixations.length;
-
-        if (settings.correctForEmptyLines && i > 0 && (currentLineY - lastLineY) > minYDiffForLineCorrection) {
-            const origLineID = currentLineID;
-            currentLineID += Math.round( (currentLineY - lastLineY) / interlineDistance ) - 1;
-            logger.log( `Correction: #${origLineID} => ${currentLineID}` );
-        }
-
-        for (let j = 0; j < fixations.length; j += 1) {
-            fixations[j].line = currentLineID;
-        }
-
-        lastLineY = currentLineY;
-        currentLineID += 1;
-    }
 }
 
 module.exports = ProgressionMerger;

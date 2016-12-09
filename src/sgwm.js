@@ -1,22 +1,27 @@
 const regression = require('./regression.js');
-const logger = require('./logger.js').Logger;
 
 const farFixationFilter = require('./farFixationFilter');
 const shortFixationFilter = require('./shortFixationFilter');
 const splitToProgressions = require('./splitToProgressions');
 const Text = require('./text');
 const ProgressionMerger = require('./progressionMerger');
-const fixationAligner = require('./fixationAligner');
 const WordMapper = require('./wordMapper');
 
+let logger;
+
 class SGWM {
-	constructor() {
+	constructor( logger_ ) {
+        if (logger_) {
+            logger = logger_;
+        }
 	}
 
 	// Arguments:
 	//	data ({
-	//		fixations: Array of {x, y, duration},
-	//		words: Aarray of {}
+	//		fixations (Array of Fixations)
+    //          Fixation = {ts, x, y, duration}
+	//		words (Aarray of Word)
+    //          Word = {x, y, width, height, text, row:optional=<line ID starting form 1>}
 	//	})
     map( data ) {
         let fixations = data.fixations;
@@ -27,7 +32,7 @@ class SGWM {
         }
 
         for (let i = 0; i < fixations.length; i += 1) {
-	        fixation.id = i;
+	        fixations[i].id = i;
         }
 
     	fixations = farFixationFilter( fixations );
@@ -35,19 +40,16 @@ class SGWM {
 
     	const text = new Text( data.words );
 
-    	const progressions = splitToProgressions( fixations, text.lineHeight );
+    	const progressions = splitToProgressions( fixations, text.lineHeight, text.interlineDistance );
 
-		const merger = new ProgressionMerger( text.interlineDistance );
-    	const fixationLines = merger.merge( progressions );
-    	merger.align( fixationLines, text.lines );
+		const merger = new ProgressionMerger( text.interlineDistance, logger );
+    	const fixationLines = merger.merge( progressions, text.lines.length );
 
-    	fixationAligner( fixationLines, text.lines );
-
-	    const wordMapper = new WordMapper();
+	    const wordMapper = new WordMapper( logger );
 	    wordMapper.map( fixationLines, text.lines );
 	    wordMapper.clean( fixations, text.words );
 
-    	data.fixations = fixations;
+    	return { fixations, text };
     }
 }
 

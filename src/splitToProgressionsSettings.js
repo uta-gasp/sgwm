@@ -6,7 +6,8 @@ class ProgressionSplitterSettings extends Settings {
 		this._bounds = {
 			left: -2,
 			right: 20,
-			vertical: 2.5,
+			verticalChar: 1.5,	// in characters
+			verticalLine: 0.7,	// in interline distances
 		};
 		this._angle = Math.sin( 10 * Math.PI / 180 );
 
@@ -18,11 +19,16 @@ class ProgressionSplitterSettings extends Settings {
 	get angle() { return this._angle; }
 	set angle( value ) { this._angle = value; }
 
-	pixelBounds( lineHeight ) {
+	pixelBounds( lineHeight, interlineDistance ) {
+		const vertical = Math.min(
+			this._bounds.verticalChar * lineHeight,
+			this._bounds.verticalLine * interlineDistance
+		);
+
 		return {
 			left: this._bounds.left * lineHeight,
 			right: this._bounds.right * lineHeight,
-			vertical: dx => this._bounds.vertical * lineHeight + dx * this._angle
+			vertical: dx => vertical + dx * this._angle
 		};
 	}
 };

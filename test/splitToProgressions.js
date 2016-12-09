@@ -5,13 +5,15 @@ const SplitToProgressionsSettings = require('./../src/splitToProgressionsSetting
 
 describe( 'splitToProgressions', () => {
 	const textHeight = 20;
+	const ingtelineDistance = 50;
 
     before(() => {
     	const settings = new SplitToProgressionsSettings();
     	settings.bounds = {
 			left: -2,
 			right: 20,
-			vertical: 2.5,
+			verticalChar: 2.5,
+			verticalLine: 1
 		};
     	settings.angle = Math.sin( 10 * Math.PI / 180 );
     	settings.save();
@@ -24,7 +26,7 @@ describe( 'splitToProgressions', () => {
 	    	{x: 250, y: 100, duration: 400},
 	    ];
 
-	    const progressions = splitToProgressions( fixations, textHeight );
+	    const progressions = splitToProgressions( fixations, textHeight, ingtelineDistance );
 	    assert.equal( 1, progressions.length );
 	    assert.deepEqual( fixations, progressions[0] );
 	});
@@ -36,7 +38,7 @@ describe( 'splitToProgressions', () => {
 	    	{x: 150, y: 100, duration: 400},
 	    ];
 
-	    const progressions = splitToProgressions( fixations, textHeight );
+	    const progressions = splitToProgressions( fixations, textHeight, ingtelineDistance );
 	    assert.equal( 2, progressions.length );
 	    assert.equal( 2, progressions[0].length );
 	    assert.equal( 1, progressions[1].length );
@@ -50,7 +52,7 @@ describe( 'splitToProgressions', () => {
 	    	{x: 250, y: 610, duration: 400},
 	    ];
 
-	    const progressions = splitToProgressions( fixations, textHeight );
+	    const progressions = splitToProgressions( fixations, textHeight, ingtelineDistance );
 	    assert.equal( 3, progressions.length );
 	    assert.equal( 2, progressions[0].length );
 	    assert.equal( 1, progressions[1].length );

@@ -4,22 +4,22 @@
 const SplitToProgressionsSettings = require('./splitToProgressionsSettings');
 
 const settings = new SplitToProgressionsSettings();
-let bounds;
+let progressionBox;
 
 const isProgressiveReadingSaccade = function( dx, dy ) {
 	return (
-		dx > bounds.left &&
-		dx < bounds.right &&
-		Math.abs( dy ) < bounds.vertical( dx )
+		dx > progressionBox.left &&
+		dx < progressionBox.right &&
+		Math.abs( dy ) < progressionBox.vertical( dx )
 	);
 };
 
 // Arguments:
 //   fixations (Array of Fixation)
 //   lineHeight (Number): word box height in pixels
-module.exports = function( fixations, lineHeight ) {
+module.exports = function( fixations, lineHeight, interlineDistance ) {
     settings.load();
-    bounds = settings.pixelBounds( lineHeight );
+    progressionBox = settings.pixelBounds( lineHeight, interlineDistance );
 
     const result = [];
     let currentProgression;
