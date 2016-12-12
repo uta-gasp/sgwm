@@ -3,21 +3,23 @@
 const webpack = require( 'webpack' );
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
+const isDev = NODE_ENV === 'development';
 
 module.exports = {
 	context: __dirname + '/src',
 	entry: './sgwm.js',
 	output: {
-		filename: 'sgwm.js',
+		path: __dirname + '/build',
+		filename: isDev ? 'sgwm.js' : 'sgwm.min.js',
 		library: 'SGWM'
 	},
 
-	watch: NODE_ENV === 'development',
+	watch: isDev,
 	watchOptions: {
 		aggregateTimeout: 100
 	},
 
-	devtool: NODE_ENV === 'development' ? 'source-map' : null,
+	devtool: isDev ? 'source-map' : null,
 
 	plugins: [
 		new webpack.NoErrorsPlugin(),
@@ -43,12 +45,15 @@ module.exports = {
 			// { test: /\.js$/, loader: "eslint", exclude: /node_modules/ },
 		],
 		loaders: [
-			{ test: /\.js$/, loader: 'babel', exclude: /node_modules/ }
 		]
 	}
 };
 
-if (NODE_ENV === 'production') {
+if (!isDev) {
+	module.exports.module.loaders.push(
+		{ test: /\.js$/, loader: 'babel', exclude: /node_modules/ }
+	);
+
 	module.exports.plugins.push(
 		new webpack.optimize.UglifyJsPlugin({
 			compress: {
