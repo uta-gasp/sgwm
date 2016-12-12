@@ -10,7 +10,7 @@ The library files are located in the `sgwm/build` folder.
 
 ## Usage
 
-    const SGWM = require( 'sgwm' )
+    const SGWM = require( 'sgwm' );
     const sgwm = new SGWM();
 
     const { fixations, text } = sgwm.map( { 
@@ -23,9 +23,9 @@ The library files are located in the `sgwm/build` folder.
         ]
     });
 
-The returned `fixations` arrays stores copies of the original fixations, some probably removed or modified, with `line` property indicating the line index and `word` property containing a word object `{left, top, right, bottom, text, index, index, id}` where `index` is the word index in the given line and `id` is its index in the text. 
+The returned `fixations` array stores copies of the original fixations, some probably removed or modified, where each fixation, if mapped to some word,  complemened with `line` property indicating the line index and `word` property containing an object `{left, top, right, bottom, text, index, index, id}` where `index` is the word index in the given line and `id` is its index in the text. 
 
-The returned `text` object has `words` array corresponding to the input words array, but the word may have additional property `fixations` which is the array of fixations (links to the items in the returned `fixations` array) mapped onto this word.
+The returned `text` object has `words` property, an array corresponding to the input words array. Each word may have additional property `fixations` which is the array of fixations (refs to the items in the returned `fixations` array) mapped onto this word. The object also has some other properties like `lines`, the array of arrays of words.
 
 ## Modification
 
