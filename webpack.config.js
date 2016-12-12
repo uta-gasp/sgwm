@@ -19,7 +19,14 @@ module.exports = {
 		aggregateTimeout: 100
 	},
 
-	devtool: isDev ? 'source-map' : null,
+	devtool: isDev ? 'source-map' : false,
+
+	resolve: {
+		modules: [ 
+			__dirname + '/src',
+			'node_modules'
+		]
+	},
 
 	plugins: [
 		new webpack.NoErrorsPlugin(),
@@ -28,41 +35,29 @@ module.exports = {
 		})
 	],
 
-	resolve: {
-		modulesDirectories: [ 'node_modules' ],
-		extensions: [ '', '.js' ]
-	},
-
-	resolve: {
-		modulesDirectories: [ 'node_modules' ],
-		moduleTemplates: [ '*-loader' ],
-		extensions: [ '', '.js' ]
-	},
-
 	module: {
-		preLoaders: [
-			{ test: /\.js$/, loader: "jshint", exclude: /node_modules/ },
-			// { test: /\.js$/, loader: "eslint", exclude: /node_modules/ },
-		],
 		loaders: [
 		]
 	}
 };
 
-if (!isDev) {
+if (isDev) {
+	module.exports.module.loaders.push({
+		test: /\.js$/, loader: "jshint-loader", exclude: /node_modules/
+	});
+}
+else {
 	module.exports.module.loaders.push(
-		{ test: /\.js$/, loader: 'babel', exclude: /node_modules/ }
+		{ test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ }
 	);
 
 	module.exports.plugins.push(
 		new webpack.optimize.UglifyJsPlugin({
 			compress: {
-				warnings: true,
-				drop_console: false,
+				warnings: false,
 				unsafe: true
 			},
-			lint: true,
-			verbose: true
+			lint: false
 		})
 	);
 }
