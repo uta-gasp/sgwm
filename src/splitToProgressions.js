@@ -1,6 +1,8 @@
 /*
 	Create a set of chunks of progressive reading fixations
 */
+'use strict';
+
 const SplitToProgressionsSettings = require('./splitToProgressionsSettings');
 
 const settings = new SplitToProgressionsSettings();
@@ -44,4 +46,4 @@ module.exports = function( fixations, lineHeight, interlineDistance ) {
     }
 
     return result;
-}
+};

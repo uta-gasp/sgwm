@@ -1,6 +1,7 @@
 /*
     Merges progressive reading fixations within the text lines
 */
+'use strict';
 
 const regression = require('./regression.js');
 const ProgressionMergerSettings = require('./progressionMergerSettings');
@@ -122,17 +123,17 @@ function isValidSet( set, lengthType, lengthTypeThreshold) {
     return true;
 }
 
-function getFittingError( fixations, model ) {
-    let error = 0;
+// function getFittingError( fixations, model ) {
+//     let error = 0;
 
-    for (let i = 0; i < fixations.length; i += 1) {
-        const fixation = fixations[i];
-        const y = regression.fit( model, fixation.x );
-        error += (fixation.y - y) * (fixation.y - y);
-    }
+//     for (let i = 0; i < fixations.length; i += 1) {
+//         const fixation = fixations[i];
+//         const y = regression.fit( model, fixation.x );
+//         error += (fixation.y - y) * (fixation.y - y);
+//     }
 
-    return Math.sqrt( error / fixations.length );
-}
+//     return Math.sqrt( error / fixations.length );
+// }
 
 function fixationsToArray( fixations ) {
     const result = [];

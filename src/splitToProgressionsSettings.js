@@ -1,3 +1,5 @@
+'use strict';
+
 const Settings = require('./settings');
 
 class ProgressionSplitterSettings extends Settings {
@@ -31,6 +33,6 @@ class ProgressionSplitterSettings extends Settings {
 			vertical: dx => vertical + dx * this._angle
 		};
 	}
-};
+}
 
 module.exports = ProgressionSplitterSettings;

@@ -1,6 +1,6 @@
 const assert = require('chai').assert;
 
-const Text = require('./../src/text');
+const TextModel = require('./../src/textModel');
 const WordMapper = require('./../src/wordMapper');
 const WordMapperSettings = require('./../src/wordMapperSettings');
 
@@ -79,7 +79,7 @@ describe( 'WordMapper', () => {
 			    ],
 		    ];
 
-			const text = new Text( words );
+			const text = new TextModel( words );
 		    const wordMapper = new WordMapper( logger );
 		    wordMapper.map( fixations, text.lines );
 
@@ -103,7 +103,7 @@ describe( 'WordMapper', () => {
 				new Word(200, 210, 90, 20, 'iiiiii' ),
 				new Word(300, 210, 90, 20, 'jjjjjj' ),
 			];
-			const text = new Text( words );
+			const text = new TextModel( words );
 
 			const fixations = [
 		    	{x: 150, y: 100, duration: 300, line: 0, word: text.words[0] },

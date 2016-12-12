@@ -9,7 +9,13 @@
   "author": "lexasss",
   "license": "MIT",
   "devDependencies": {
+    "babel-core": "^6.20.0",
+    "babel-loader": "^6.2.9",
+    "babel-preset-latest": "^6.16.0",
     "chai": "^3.5.0",
-    "mock-local-storage": "^1.0.2"
+    "jshint": "^2.9.4",
+    "jshint-loader": "^0.8.3",
+    "mock-local-storage": "^1.0.2",
+    "webpack": "^1.14.0"
   }
 }

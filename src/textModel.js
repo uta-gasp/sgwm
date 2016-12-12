@@ -1,8 +1,9 @@
 /*
 	Creates an array lines, each as array of word boxes
 */
+'use strict';
 
-class Text {
+class TextModel {
 	// Arguments
 	//	 words (Array of {x, y, width, height, text, row:optional=<line ID starting form 1>})
     // Notes:
@@ -50,10 +51,7 @@ class Text {
         this._lines = lines;
         this._words = wordList;
 
-        const firstLine = lines[0];
-        const lastLine = lines[ lines.length - 1 ];
-
-        this._lineHeight = firstLine[0].height;
+        this._lineHeight = lines[0][0].height;
         this._interlineDistance = getInterlineDistance( lines );
 	}
 
@@ -110,4 +108,4 @@ function median( array ) {
     return median( medians );
 }
 
-module.exports = Text;
+module.exports = TextModel;

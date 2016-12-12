@@ -1,3 +1,5 @@
+'use strict';
+
 const Settings = require('./settings');
 
 class FarFixationFilterSettings extends Settings {
@@ -16,6 +18,6 @@ class FarFixationFilterSettings extends Settings {
 	set marginX( value ) { this._marginX = value; }
 	get marginY() { return this._marginY; }
 	set marginY( value ) { this._marginY = value; }
-};
+}
 
 module.exports = FarFixationFilterSettings;

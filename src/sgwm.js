@@ -1,19 +1,18 @@
-const regression = require('./regression.js');
+/*
+    Main class (and entry point), unites all the fuctionality
+*/
+'use strict';
 
 const farFixationFilter = require('./farFixationFilter');
 const shortFixationFilter = require('./shortFixationFilter');
 const splitToProgressions = require('./splitToProgressions');
-const Text = require('./text');
+const TextModel = require('./textModel');
 const ProgressionMerger = require('./progressionMerger');
 const WordMapper = require('./wordMapper');
 
-let logger;
-
 class SGWM {
-	constructor( logger_ ) {
-        if (logger_) {
-            logger = logger_;
-        }
+	constructor( logger ) {
+        this.logger = logger;
 	}
 
 	// Arguments:
@@ -38,14 +37,14 @@ class SGWM {
     	fixations = farFixationFilter( fixations );
     	fixations = shortFixationFilter( fixations );
 
-    	const text = new Text( data.words );
+    	const text = new TextModel( data.words );
 
     	const progressions = splitToProgressions( fixations, text.lineHeight, text.interlineDistance );
 
-		const merger = new ProgressionMerger( text.interlineDistance, logger );
+		const merger = new ProgressionMerger( text.interlineDistance, this.logger );
     	const fixationLines = merger.merge( progressions, text.lines.length );
 
-	    const wordMapper = new WordMapper( logger );
+	    const wordMapper = new WordMapper( this.logger );
 	    wordMapper.map( fixationLines, text.lines );
 	    wordMapper.clean( fixations, text.words );
 

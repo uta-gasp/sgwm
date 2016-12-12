@@ -1,3 +1,5 @@
+'use strict';
+
 const Settings = require('./settings');
 
 class ShortFixationFilterSettings extends Settings {
@@ -19,6 +21,6 @@ class ShortFixationFilterSettings extends Settings {
 	set mergingDurationThreshold( value ) { this._mergingDurationThreshold = value; }
 	get removingDurationThreshold() { return this._removingDurationThreshold; }
 	set removingDurationThreshold( value ) { this._removingDurationThreshold = value; }
-};
+}
 
 module.exports = ShortFixationFilterSettings;

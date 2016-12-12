@@ -1,6 +1,8 @@
 /*
 	Base class for settings
 */
+'use strict';
+
 class Settings {
 	constructor( name ) {
 		this._name = name;
@@ -9,7 +11,7 @@ class Settings {
 	load() {
 		const hiddenProps = Object.keys(new Settings(''));
 
-		for (const p in this) {
+		for (let p in this) {
 			if (hiddenProps.indexOf( p ) > -1) {
 				continue;
 			}
@@ -23,7 +25,7 @@ class Settings {
 	save() {
 		const hiddenProps = Object.keys(new Settings(''));
 
-		for (const p in this) {
+		for (let p in this) {
 			if (hiddenProps.indexOf( p ) > -1) {
 				continue;
 			}

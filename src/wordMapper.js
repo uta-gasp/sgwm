@@ -1,6 +1,7 @@
 /*
 	Maps fixations to words within a line
 */
+'use strict';
 
 const WordMapperSettings = require('./wordMapperSettings');
 
@@ -62,7 +63,7 @@ function getTextLine( textLines, lineID ) {
         }
     }
     return textLine;
-};
+}
 
 /*****************
     rescaleFixations
@@ -75,7 +76,7 @@ function getNewLeftMostX( word ) {
     else {
         return word.x + Math.floor( word.width / 2 );
     }
-};
+}
 
 function getNewRightMostX( word ) {
     if (word.text.length > settings.wordCharSkipStart + settings.wordCharSkipEnd) {
@@ -84,7 +85,7 @@ function getNewRightMostX( word ) {
     else {
         return word.x + Math.floor( word.width / 2 );
     }
-};
+}
 
 function getFixationsRange( fixations ) {
     let leftMostX = Number.MAX_VALUE,
@@ -238,7 +239,7 @@ function getPrevFixationOnLine( fixations, index ) {
     }
 
     return result;
-};
+}
 
 function getLastChunkSaccade( fixations, index, direction ) {
     let result = null;
@@ -261,7 +262,11 @@ function getLastChunkSaccade( fixations, index, direction ) {
     }
 
     return [ result, index ];
-};
+}
+
+function removeFixation( fixations, id ) {
+    return fixations.filter( fixation => fixation.id !== id );
+}
 
 function removeTransitions( fixations, words ) {
     let index = fixations.length - 1;
@@ -288,7 +293,7 @@ function removeTransitions( fixations, words ) {
                         log( 'removed @ word #', word.id );
                     }
                     else {
-                        word.fixations = word.fixations.filter( f => f.id !== fix.id );
+                        word.fixations = removeFixation( word.fixations, fix.id );
                         log( 'one removed @ word #', word.id );
                     }
 

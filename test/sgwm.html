@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>SGWM test</title>
+		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+		<base href="/">
+	</head>
+	<body>
+		<div class="panel">
+			<div id="status" class="panel-body"></div>
+		</div>
+		<script src="sgwm.js"></script>
+		<script>
+			let ok;
+			try {
+				const sgwm = new SGWM();
+				ok = !!sgwm;
+			}
+			catch (ex) {
+				ok = false;
+			}
+
+			const msg = document.querySelector( '#status' );
+			msg.textContent = ok ? 'success' : 'failed';
+			msg.classList.add( ok ? 'bg-success' : 'bg-danger' );
+		</script>
+	</body>
+</html>

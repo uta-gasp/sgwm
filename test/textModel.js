@@ -1,6 +1,6 @@
 const assert = require('assert');
 
-const Text = require('./../src/text');
+const TextModel = require('./../src/textModel');
 
 function Word( x, y, w, h ) {
 	this.x = x;
@@ -21,9 +21,9 @@ const words = [
 	new Word(300, 180, 90, 20),
 ];
 
-describe( 'Text', () => {
+describe( 'TextModel', () => {
 	it( 'should make 3 lines each of 3 words', () =>  {
-		const text = new Text( words );
+		const text = new TextModel( words );
 		assert.equal( 3, text.lines.length );
 		assert.equal( text.lines[0].id, 0 );
 

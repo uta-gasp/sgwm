@@ -8,7 +8,7 @@
 * Licensed under the MIT license.
 *
 **/
-
+/* jshint ignore:start */
 ;(function() {
     'use strict';
 
@@ -265,3 +265,4 @@
     }
 
 }());
+/* jshint ignore:end */

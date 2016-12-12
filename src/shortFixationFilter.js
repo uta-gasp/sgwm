@@ -1,6 +1,7 @@
 /*
 	Filters out short fixatins by merging with other or just removing
 */
+'use strict';
 
 const ShortFixationFilterSettings = require('./shortFixationFilterSettings');
 
@@ -20,7 +21,7 @@ function join( a, b ) {
     a.duration = totalDuration;
     a.merged = (a.merged || 1) + (b.merged || 1);
     return a;
-};
+}
 
 // Tries to join the fixation
 // Arguments:
@@ -80,7 +81,7 @@ function joinOrDeleteShortFixations( fixations ) {
 	}
 
     return result;
-};
+}
 
 // Arguments:
 //	 fixations (Array of {x, y, duration})

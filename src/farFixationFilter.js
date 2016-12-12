@@ -1,6 +1,7 @@
 /*
     Filters out fixatins far from the text
 */
+'use strict';
 
 const FarFixationFilterSettings = require('./farFixationFilterSettings');
 
@@ -31,4 +32,4 @@ module.exports = function( fixations, textbox ) {
     }
 
     return result;
-}
+};

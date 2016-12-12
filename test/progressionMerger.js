@@ -2,7 +2,7 @@ const assert = require('chai').assert;
 
 const ProgressionMerger = require('./../src/progressionMerger');
 const ProgressionMergerSettings = require('./../src/progressionMergerSettings');
-const Text = require('./../src/text');
+const TextModel = require('./../src/textModel');
 
 function Word( x, y, w, h ) {
 	this.x = x;
@@ -183,7 +183,7 @@ describe( 'ProgressionMerger', () => {
 			new Word(300, 265, 90, 20),
 		];
 
-		const text = new Text( words );
+		const text = new TextModel( words );
 
 	    const merger = new ProgressionMerger( text.interlineDistance );
 

@@ -1,3 +1,5 @@
+'use strict';
+
 const Settings = require('./settings');
 
 class WordMapperSettings extends Settings {
@@ -25,6 +27,6 @@ class WordMapperSettings extends Settings {
 	set partialLengthMaxWordLength( value ) { this._partialLengthMaxWordLength = value; }
 	get effectiveLengthFactor() { return this._effectiveLengthFactor; }
 	set effectiveLengthFactor( value ) { this._effectiveLengthFactor = value; }
-};
+}
 
 module.exports = WordMapperSettings;

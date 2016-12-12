@@ -1,3 +1,5 @@
+'use strict';
+
 const Settings = require('./settings');
 
 class ProgressionMergerSettings extends Settings {
@@ -26,6 +28,6 @@ class ProgressionMergerSettings extends Settings {
 	set correctForEmptyLines( value ) { this._correctForEmptyLines = value; }
 	get emptyLineDetectorFactor() { return this._emptyLineDetectorFactor; }
 	set emptyLineDetectorFactor( value ) { this._emptyLineDetectorFactor = value; }
-};
+}
 
 module.exports = ProgressionMergerSettings;

@@ -2,6 +2,7 @@
     Marks fixations that are at the end of the progressive reading,
     i.e. last before the first fixation in the chain of regressive fixations
 */
+'use strict';
 
 function prevMappedFix( fixations, index, step ) {
     let result;
