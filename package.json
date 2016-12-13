@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha -r ./node_modules/mock-local-storage",
     "build": "./node_modules/.bin/webpack",
-    "release": "NODE_ENV=production ./node_modules/.bin/webpack"
+    "release": "set NODE_ENV=production && call ./node_modules/.bin/webpack"
   },
   "author": "lexasss",
   "license": "MIT",

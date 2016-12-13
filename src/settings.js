@@ -10,7 +10,7 @@ class Settings {
 
 		this._fullPath = function( name ) {
 			return [ this._domain, this._name, name ].join( '_' );
-		}
+		};
 	}
 
 	load() {

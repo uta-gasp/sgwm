@@ -194,6 +194,11 @@ var SGWM =
 	class Settings {
 		constructor( name ) {
 			this._name = name;
+			this._domain = 'sgwm';
+	
+			this._fullPath = function( name ) {
+				return [ this._domain, this._name, name ].join( '_' );
+			};
 		}
 	
 		load() {
@@ -203,7 +208,7 @@ var SGWM =
 				if (hiddenProps.indexOf( p ) > -1) {
 					continue;
 				}
-				const value = JSON.parse( localStorage.getItem( this._name + '_' + p ) );
+				const value = JSON.parse( localStorage.getItem( this._fullPath( p ) ) );
 				if (value !== null) {
 					this[p] = value;
 				}
@@ -217,7 +222,7 @@ var SGWM =
 				if (hiddenProps.indexOf( p ) > -1) {
 					continue;
 				}
-				localStorage.setItem( this._name + '_' + p, JSON.stringify( this[p] ) );
+				localStorage.setItem( this._fullPath( p ), JSON.stringify( this[p] ) );
 			}
 		}
 	}
@@ -614,6 +619,7 @@ var SGWM =
 	        this._interlineDistance = interlineDistance;
 	
 	        if (logger) {
+	            logger.log( '. . . . . . . . .' );
 	            log = (...params) => {
 	                logger.log( 'ProgressionMerger   ', ...params );
 	            };
@@ -1266,6 +1272,7 @@ var SGWM =
 	        settings.load();
 	
 	        if (logger) {
+	            logger.log( '. . . . . . . . .' );
 	            log = (...params) => {
 	                logger.log( 'WordMapper   ', ...params );
 	            };
