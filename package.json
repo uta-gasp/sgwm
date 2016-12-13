@@ -1,6 +1,6 @@
 {
   "name": "sgwm.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Static gaze-to-word mapper",
   "main": "sgwm.js",
   "scripts": {
