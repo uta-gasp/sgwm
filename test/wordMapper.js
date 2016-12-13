@@ -13,6 +13,16 @@ function Word( x, y, w, h, text, expectedFixations ) {
 	this.expectedFixations = expectedFixations;
 }
 
+function addFixationIDs( progressions ) {
+    let i = 0;
+    progressions.forEach( set => {
+    	set.forEach( fix => {
+    		fix.id = i;
+    		i += 1;
+    	});
+    });
+}
+
 describe( 'WordMapper', () => {
 	const logger = {
 		logs: [],
@@ -46,7 +56,6 @@ describe( 'WordMapper', () => {
 
 	describe( '#map', () => {
 		it( 'should correctly map fixations to words', () =>  {
-			logger.log('\n');
 			const words = [
 				new Word(100, 100, 90, 20, 'aaaaaa', 1),
 				new Word(200, 100, 90, 20, 'bbbbbb', 2),
@@ -78,19 +87,19 @@ describe( 'WordMapper', () => {
 			    	{x: 350, y: 200, duration: 300, line: 2},
 			    ],
 		    ];
+		    addFixationIDs( fixations );
 
 			const text = new TextModel( words );
 		    const wordMapper = new WordMapper( logger );
 		    wordMapper.map( fixations, text.lines );
 
 			assert.ok( fixations.every( line => line.every( fixation => !!fixation.word ) ), 'each fixation should be mapped onto a word' );
-			assert.ok( text.lines.every( line => line.every( word => word.fixations.length === word.expectedFixations ), 'each word should match the number pf the expected fixations mapped onto it' ) );
+			assert.ok( text.lines.every( line => line.every( word => word.fixations.length === word.expectedFixations ), 'each word should match the number of the expected fixations mapped onto it' ) );
 		});
 	});
 
 	describe( '#clean', () => {
 		it( 'should remove 1 mapping as the transition', () =>  {
-			logger.log('\n');
 			const words = [
 				new Word(100, 100, 90, 20, 'aaaaaa' ),
 				new Word(200, 100, 90, 20, 'bbbbbb' ),

@@ -17,9 +17,11 @@ describe( 'SplitToProgressionsSettings', () => {
 			const settings = new SplitToProgressionsSettings();
 			let propCount = 0;
 			for (let p in settings) {
-				propCount += 1;
+				if (settings.hasOwnProperty( p )) {
+					propCount += 1;
+				}
 			}
-			assert.notEqual( 0, propCount );
+			assert.notEqual( 0, propCount, 'number of properties should be >0' );
 		});
 	});
 
@@ -28,7 +30,7 @@ describe( 'SplitToProgressionsSettings', () => {
 			const settings = new SplitToProgressionsSettings();
 			settings.bounds.left = 0;
 			settings.save();
-			assert.notEqual( 0, localStorage.length );
+			assert.notEqual( 0, localStorage.length, 'number of properties saved to the localStorage should be >0' );
 		});
 	});
 

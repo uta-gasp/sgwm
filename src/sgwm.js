@@ -10,6 +10,12 @@ const TextModel = require('./textModel');
 const ProgressionMerger = require('./progressionMerger');
 const WordMapper = require('./wordMapper');
 
+const FarFixationFilterSettings = require('./farFixationFilterSettings');
+const ProgressionMergerSettings = require('./progressionMergerSettings');
+const ShortFixationFilterSettings = require('./shortFixationFilterSettings');
+const SplitToProgressionsSettings = require('./splitToProgressionsSettings');
+const WordMapperSettings = require('./wordMapperSettings');
+
 class SGWM {
 	constructor( logger ) {
         this.logger = logger;
@@ -50,6 +56,12 @@ class SGWM {
 
     	return { fixations, text };
     }
+
+    static get FarFixationFilterSettings() { return FarFixationFilterSettings; }
+    static get ProgressionMergerSettings() { return ProgressionMergerSettings; }
+    static get ShortFixationFilterSettings() { return ShortFixationFilterSettings; }
+    static get SplitToProgressionsSettings() { return SplitToProgressionsSettings; }
+    static get WordMapperSettings() { return WordMapperSettings; }
 }
 
 module.exports = SGWM;

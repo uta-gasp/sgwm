@@ -80,7 +80,6 @@ describe( 'SGWM', () => {
     });
 
 	it( 'should correctly map fixations to words', () =>  {
-		logger.log('\n');
 		const words = [
 			new Word(100, 100, 90, 18, 'aaaaaa' ),
 			new Word(200, 100, 90, 18, 'bbbbbb' ),
@@ -116,9 +115,9 @@ describe( 'SGWM', () => {
 	    const mapper = new SGWM( logger );
 	    const { fixations, text } = mapper.map( { fixations: fixes, words: words } );
 
-		assert.equal( 8, fixations.reduce( (sum, fix) => (sum + (fix.line === 0 ? 1 : 0) ), 0) );
-		assert.equal( 5, fixations.reduce( (sum, fix) => (sum + (fix.line === 1 ? 1 : 0) ), 0) );
-		assert.equal( 2, fixations.reduce( (sum, fix) => (sum + (fix.line === 2 ? 1 : 0) ), 0) );
+		assert.equal( 8, fixations.reduce( (sum, fix) => (sum + (fix.line === 0 ? 1 : 0) ), 0), '8 fixations should be on the line.0' );
+		assert.equal( 5, fixations.reduce( (sum, fix) => (sum + (fix.line === 1 ? 1 : 0) ), 0), '5 fixations should be on the line.1' );
+		assert.equal( 2, fixations.reduce( (sum, fix) => (sum + (fix.line === 2 ? 1 : 0) ), 0), '2 fixations should be on the line.2' );
 	});
 });
 

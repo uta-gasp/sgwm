@@ -27,8 +27,8 @@ describe( 'splitToProgressions', () => {
 	    ];
 
 	    const progressions = splitToProgressions( fixations, textHeight, ingtelineDistance );
-	    assert.equal( 1, progressions.length );
-	    assert.deepEqual( fixations, progressions[0] );
+	    assert.equal( 1, progressions.length, 'not 1 progression' );
+	    assert.deepEqual( fixations, progressions[0], 'not all fixations went to the only progression' );
 	});
 
 	it( 'should make 2 progression', () =>  {
@@ -39,9 +39,9 @@ describe( 'splitToProgressions', () => {
 	    ];
 
 	    const progressions = splitToProgressions( fixations, textHeight, ingtelineDistance );
-	    assert.equal( 2, progressions.length );
-	    assert.equal( 2, progressions[0].length );
-	    assert.equal( 1, progressions[1].length );
+	    assert.equal( 2, progressions.length, 'not 2 progressions' );
+	    assert.equal( 2, progressions[0].length, 'progression.0 does not have 2 fixations' );
+	    assert.equal( 1, progressions[1].length, 'progression.1 does not have 1 fixation' );
 	});
 
 	it( 'should make 3 progression', () =>  {
@@ -53,9 +53,9 @@ describe( 'splitToProgressions', () => {
 	    ];
 
 	    const progressions = splitToProgressions( fixations, textHeight, ingtelineDistance );
-	    assert.equal( 3, progressions.length );
-	    assert.equal( 2, progressions[0].length );
-	    assert.equal( 1, progressions[1].length );
-	    assert.equal( 1, progressions[2].length );
+	    assert.equal( 3, progressions.length, 'not 3 progressions' );
+	    assert.equal( 2, progressions[0].length, 'progression.0 does not have 2 fixations' );
+	    assert.equal( 1, progressions[1].length, 'progression.1 does not have 1 fixations' );
+	    assert.equal( 1, progressions[2].length, 'progression.2 does not have 1 fixations' );
 	});
 });

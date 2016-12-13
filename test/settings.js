@@ -16,7 +16,7 @@ describe( 'Settings', () => {
 		it( 'should not save anything to localStorage', () =>  {
 			const settings = new Settings();
 			settings.save();
-			assert.equal( 0, localStorage.length );
+			assert.equal( 0, localStorage.length, 'should be no settings saved' );
 		});
 	});
 });

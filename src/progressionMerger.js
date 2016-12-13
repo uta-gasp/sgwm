@@ -27,6 +27,7 @@ class ProgressionMerger {
         this._interlineDistance = interlineDistance;
 
         if (logger) {
+            logger.log( '. . . . . . . . .' );
             log = (...params) => {
                 logger.log( 'ProgressionMerger   ', ...params );
             };

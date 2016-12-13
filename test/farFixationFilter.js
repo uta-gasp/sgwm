@@ -27,7 +27,7 @@ describe( 'farFixationFilter', () => {
 	    ];
 
 	    const filtered = farFixationFilter( fixations, textbox );
-	    assert.deepEqual( fixations, filtered )
+	    assert.deepEqual( fixations, filtered, 'input and output fixations do not match' )
 	});
 
 	it( 'should remove first', () =>  {
@@ -38,9 +38,9 @@ describe( 'farFixationFilter', () => {
 	    ];
 
 	    const filtered = farFixationFilter( fixations, textbox );
-	    assert.equal( filtered.length, fixations.length - 1 );
-	    assert.deepEqual( filtered[0], fixations[1] );
-	    assert.deepEqual( filtered[1], fixations[2] );
+	    assert.equal( filtered.length, fixations.length - 1, 'length was not decreased by 1' );
+	    assert.deepEqual( filtered[0], fixations[1], 'input.1 !== output.0' );
+	    assert.deepEqual( filtered[1], fixations[2], 'input.2 !== output.1' );
 	});
 
 	it( 'should remove the last', () =>  {
@@ -51,9 +51,9 @@ describe( 'farFixationFilter', () => {
 	    ];
 
 	    const filtered = farFixationFilter( fixations, textbox );
-	    assert.equal( filtered.length, fixations.length - 1 );
-	    assert.deepEqual( filtered[0], fixations[0] );
-	    assert.deepEqual( filtered[1], fixations[1] );
+	    assert.equal( filtered.length, fixations.length - 1, 'length was not decreased by 1' );
+	    assert.deepEqual( filtered[0], fixations[0], 'input.0 !== output.0' );
+	    assert.deepEqual( filtered[1], fixations[1], 'input.1 !== output.1' );
 	});
 });
 

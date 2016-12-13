@@ -7,23 +7,58 @@
 		<base href="/">
 	</head>
 	<body>
-		<div class="panel">
-			<div id="status" class="panel-body"></div>
-		</div>
+		<div id="status" class="panel"></div>
 		<script src="build/sgwm.js"></script>
 		<script>
-			let ok;
-			try {
-				const sgwm = new SGWM();
-				ok = !!sgwm;
-			}
-			catch (ex) {
-				ok = false;
+			function test( className, cb ) {
+				let ok;
+				try {
+					const path = className.split( '.' );
+					if (path.length > 1) {
+						let obj = this[ path[0] ];
+						for (let i = 1; i < path.length - 2; i += 1) {
+							obj = obj[ path[i] ];
+						}
+						obj = new obj[ path[ path.length - 1 ] ];
+						ok = !!obj && (cb ? cb( obj ) : true);
+					}
+					else {
+						const obj = new this[ className ]();
+						ok = !!obj && (cb ? cb( obj ) : true);
+					}
+				}
+				catch (ex) {
+					ok = false;
+				}
+
+				const msg = document.createElement( 'div' );
+				msg.textContent = `${className}: ${ok ? 'success' : 'failed'}`;
+				msg.classList.add( 'panel-body' );
+				msg.classList.add( ok ? 'bg-success' : 'bg-danger' );
+				document.querySelector( '#status' ).appendChild( msg );
 			}
 
-			const msg = document.querySelector( '#status' );
-			msg.textContent = ok ? 'success' : 'failed';
-			msg.classList.add( ok ? 'bg-success' : 'bg-danger' );
+			test( 'SGWM' );
+
+			const fffSettings = new SGWM.FarFixationFilterSettings();
+			fffSettings.marginX = 111;
+			fffSettings.save();
+
+			test( 'SGWM.FarFixationFilterSettings', settings => {
+				return settings.marginX === 111;
+			});
+			test( 'SGWM.ProgressionMergerSettings', settings => {
+				return typeof settings.fitThreshold !== 'undefined';
+			});
+			test( 'SGWM.ShortFixationFilterSettings', settings => {
+				return typeof settings.mergingDistanceThreshold !== 'undefined';
+			} );
+			test( 'SGWM.SplitToProgressionsSettings', settings => {
+				return typeof settings.bounds !== 'undefined';
+			} );
+			test( 'SGWM.WordMapperSettings', settings => {
+				return typeof settings.wordCharSkipStart !== 'undefined';
+			} );
 		</script>
 	</body>
 </html>

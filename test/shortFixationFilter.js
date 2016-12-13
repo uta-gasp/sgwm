@@ -27,7 +27,7 @@ describe( 'shortFixationFilter', () => {
 	    ];
 
 	    const filtered = shortFixationFilter( fixations );
-	    assert.deepEqual( fixations, filtered )
+	    assert.deepEqual( fixations, filtered, 'inout and output should not differ' )
 	});
 
 	it( 'should join the first to the second', () =>  {
@@ -38,9 +38,9 @@ describe( 'shortFixationFilter', () => {
 	    ];
 
 	    const filtered = shortFixationFilter( fixations );
-	    assert.equal( filtered.length, fixations.length - 1 );
-	    assert.equal( filtered[0].duration, fixations[0].duration + fixations[1].duration );
-	    assert.deepEqual( filtered[1], fixations[2] );
+	    assert.equal( filtered.length, fixations.length - 1, 'output should be 1 less than input' );
+	    assert.equal( filtered[0].duration, fixations[0].duration + fixations[1].duration, 'duration of the first output fixation should be the sum of durations of the first and second input fixations' );
+	    assert.deepEqual( filtered[1], fixations[2], 'input.2 !== output.1' );
 	});
 
 	it( 'should remove first', () =>  {
@@ -51,9 +51,9 @@ describe( 'shortFixationFilter', () => {
 	    ];
 
 	    const filtered = shortFixationFilter( fixations );
-	    assert.equal( filtered.length, fixations.length - 1 );
-	    assert.deepEqual( filtered[0], fixations[1] );
-	    assert.deepEqual( filtered[1], fixations[2] );
+	    assert.equal( filtered.length, fixations.length - 1, 'output should be 1 less than input' );
+	    assert.deepEqual( filtered[0], fixations[1], 'input.1 !== output.0' );
+	    assert.deepEqual( filtered[1], fixations[2], 'input.2 !== output.1' );
 	});
 
 	it( 'should join second to the third', () =>  {
@@ -64,9 +64,10 @@ describe( 'shortFixationFilter', () => {
 	    ];
 
 	    const filtered = shortFixationFilter( fixations );
-	    assert.equal( filtered.length, fixations.length - 1 );
-	    assert.equal( filtered[1].duration, fixations[1].duration + fixations[2].duration );
-	    assert.deepEqual( filtered[0], fixations[0] );
+	    assert.equal( filtered.length, fixations.length - 1, 'output should be 1 less than input' );
+	    assert.isAbove( filtered[1].x, (fixations[1].x + fixations[2].x) / 2, 'location of the second output fixations should be closer to the third input fixation than to the second one' );
+	    assert.equal( filtered[1].duration, fixations[1].duration + fixations[2].duration, 'duration of the second output fixation should be the sum of durations of the second and third input fixations' );
+	    assert.deepEqual( filtered[0], fixations[0], 'input.0 !== output.0' );
 	});
 
 	it( 'should join third to the second', () =>  {
@@ -77,9 +78,10 @@ describe( 'shortFixationFilter', () => {
 	    ];
 
 	    const filtered = shortFixationFilter( fixations );
-	    assert.equal( filtered.length, fixations.length - 1 );
-	    assert.equal( filtered[1].duration, fixations[1].duration + fixations[2].duration );
-	    assert.deepEqual( filtered[0], fixations[0] );
+	    assert.equal( filtered.length, fixations.length - 1, 'output should be 1 less than input' );
+	    assert.isBelow( filtered[1].x, (fixations[1].x + fixations[2].x) / 2, 'location of the second output fixations should be closer to the second input fixation than to the third one' );
+	    assert.equal( filtered[1].duration, fixations[1].duration + fixations[2].duration, 'duration of the second output fixation should be the sum of durations of the second and third input fixations' );
+	    assert.deepEqual( filtered[0], fixations[0], 'input.0 !== output.0' );
 	});
 
 	it( 'should remove the last', () =>  {
@@ -90,9 +92,9 @@ describe( 'shortFixationFilter', () => {
 	    ];
 
 	    const filtered = shortFixationFilter( fixations );
-	    assert.equal( filtered.length, fixations.length - 1 );
-	    assert.deepEqual( filtered[0], fixations[0] );
-	    assert.deepEqual( filtered[1], fixations[1] );
+	    assert.equal( filtered.length, fixations.length - 1, 'output should be 1 less than input' );
+	    assert.deepEqual( filtered[0], fixations[0], 'input.0 !== output.0' );
+	    assert.deepEqual( filtered[1], fixations[1], 'input.1 !== output.1' );
 	});
 });
 

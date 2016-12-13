@@ -6,6 +6,11 @@
 class Settings {
 	constructor( name ) {
 		this._name = name;
+		this._domain = 'sgwm';
+
+		this._fullPath = function( name ) {
+			return [ this._domain, this._name, name ].join( '_' );
+		}
 	}
 
 	load() {
@@ -15,7 +20,7 @@ class Settings {
 			if (hiddenProps.indexOf( p ) > -1) {
 				continue;
 			}
-			const value = JSON.parse( localStorage.getItem( this._name + '_' + p ) );
+			const value = JSON.parse( localStorage.getItem( this._fullPath( p ) ) );
 			if (value !== null) {
 				this[p] = value;
 			}
@@ -29,7 +34,7 @@ class Settings {
 			if (hiddenProps.indexOf( p ) > -1) {
 				continue;
 			}
-			localStorage.setItem( this._name + '_' + p, JSON.stringify( this[p] ) );
+			localStorage.setItem( this._fullPath( p ), JSON.stringify( this[p] ) );
 		}
 	}
 }

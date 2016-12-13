@@ -16,6 +16,7 @@ class WordMapper {
         settings.load();
 
         if (logger) {
+            logger.log( '. . . . . . . . .' );
             log = (...params) => {
                 logger.log( 'WordMapper   ', ...params );
             };

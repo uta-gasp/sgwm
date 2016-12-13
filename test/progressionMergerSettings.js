@@ -17,9 +17,11 @@ describe( 'ProgressionMergerSettings', () => {
 			const settings = new ProgressionMergerSettings();
 			let propCount = 0;
 			for (let p in settings) {
-				propCount += 1;
+				if (settings.hasOwnProperty( p )) {
+					propCount += 1;
+				}
 			}
-			assert.notEqual( 0, propCount );
+			assert.notEqual( 0, propCount, 'number of properties should be >0' );
 		});
 	});
 
@@ -29,7 +31,7 @@ describe( 'ProgressionMergerSettings', () => {
 			settings.minLongSetLength = 4;
 			settings.fitThreshold = 0.9;
 			settings.save();
-			assert.notEqual( 0, localStorage.length );
+			assert.notEqual( 0, localStorage.length, 'number of properties saved to the localStorage should be >0' );
 		});
 	});
 
