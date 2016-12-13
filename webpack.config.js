@@ -22,7 +22,7 @@ module.exports = {
 	devtool: isDev ? 'source-map' : false,
 
 	resolve: {
-		modules: [ 
+		modules: [
 			__dirname + '/src',
 			'node_modules'
 		]
@@ -45,10 +45,15 @@ if (isDev) {
 	module.exports.module.loaders.push({
 		test: /\.js$/, loader: "jshint-loader", exclude: /node_modules/
 	});
+	module.exports.jshint = {
+		esversion: 6,
+		strict: 'global',
+		browser: true
+	};
 }
 else {
 	module.exports.module.loaders.push(
-		{ test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ }
+		{ test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/, query: { presets: ['es2015'] } }
 	);
 
 	module.exports.plugins.push(
