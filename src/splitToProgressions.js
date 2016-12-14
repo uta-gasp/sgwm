@@ -19,6 +19,10 @@ const isProgressiveReadingSaccade = function( dx, dy ) {
 // Arguments:
 //   fixations (Array of Fixation)
 //   lineHeight (Number): word box height in pixels
+// Returns:
+//   A set of progresions which are the sequences of fixations (Array of (Array of Fixation))
+// Note:
+//   Fixations in the output are referencing to the fixations in the input (no copying)
 module.exports = function( fixations, lineHeight, interlineDistance ) {
     settings.load();
     progressionBox = settings.pixelBounds( lineHeight, interlineDistance );

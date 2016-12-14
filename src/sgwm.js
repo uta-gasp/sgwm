@@ -3,8 +3,7 @@
 */
 'use strict';
 
-const farFixationFilter = require('./farFixationFilter');
-const shortFixationFilter = require('./shortFixationFilter');
+const FixationProcessor = require('./fixationProcessor');
 const splitToProgressions = require('./splitToProgressions');
 const TextModel = require('./textModel');
 const ProgressionMerger = require('./progressionMerger');
@@ -36,14 +35,13 @@ class SGWM {
             return;
         }
 
-        for (let i = 0; i < fixations.length; i += 1) {
-	        fixations[i].id = i;
-        }
+        const text = new TextModel( data.words );
 
-    	fixations = farFixationFilter( fixations );
-    	fixations = shortFixationFilter( fixations );
+        fixations = fixations.map( (fixation, i) => Object.assign( { id: i }, fixation ) );
 
-    	const text = new TextModel( data.words );
+        const fixationProcessor = new FixationProcessor( this.logger );
+    	fixations = fixationProcessor.filterByLocation( fixations, text.box );
+    	fixations = fixationProcessor.filterByDuration( fixations );
 
     	const progressions = splitToProgressions( fixations, text.lineHeight, text.interlineDistance );
 

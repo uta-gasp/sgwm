@@ -22,6 +22,7 @@ class WordMapper {
             };
         }
     }
+
     // Arguments:
     //   fixationLines (Array of (Array of Fixation)): only (all) fixations from one array correspond
     //      to a text line

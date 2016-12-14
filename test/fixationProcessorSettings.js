@@ -1,8 +1,8 @@
 const assert = require('assert');
 
-const FarFixationFilterSettings = require('./../src/FarFixationFilterSettings');
+const FixationProcessorSettings = require('./../src/fixationProcessorSettings');
 
-describe( 'FarFixationFilterSettings', () => {
+describe( 'FixationProcessorSettings', () => {
     before(() => {
         //localStorage.itemInsertionCallback = (len) => { console.log(`Storage length: ${len}` ); };
     });
@@ -14,7 +14,7 @@ describe( 'FarFixationFilterSettings', () => {
 
 	describe( '#constructor', () =>  {
 		it( 'should define some values', () =>  {
-			const settings = new FarFixationFilterSettings();
+			const settings = new FixationProcessorSettings();
 			let propCount = 0;
 			for (let p in settings) {
 				if (settings.hasOwnProperty( p )) {
@@ -27,9 +27,10 @@ describe( 'FarFixationFilterSettings', () => {
 
 	describe( '#save()', () =>  {
 		it( 'should save something to localStorage', () =>  {
-			const settings = new FarFixationFilterSettings();
-			settings.marginX = 100;
-			settings.marginY = 250;
+			const settings = new FixationProcessorSettings();
+			settings.location.marginX = 100;
+			settings.location.marginY = 250;
+			settings.duration.mergingDistanceThreshold = 50;
 			settings.save();
 			assert.notEqual( 0, localStorage.length, 'number of properties saved to the localStorage should be >0' );
 		});
@@ -37,9 +38,10 @@ describe( 'FarFixationFilterSettings', () => {
 
 	describe( '#load()', () =>  {
 		it( 'should retrieve saved values from localStorage', () =>  {
-			const settings = new FarFixationFilterSettings();
-			assert.equal( 100, settings.marginX );
-			assert.equal( 250, settings.marginY );
+			const settings = new FixationProcessorSettings();
+			assert.equal( 100, settings.location.marginX );
+			assert.equal( 250, settings.location.marginY );
+			assert.equal( 50, settings.duration.mergingDistanceThreshold );
 		});
 	});
 });
