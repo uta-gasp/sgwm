@@ -4,6 +4,8 @@
 'use strict';
 
 class Settings {
+	// Arguments:
+	//	 name (string): settings own namespace (without domain which is defined in the class)
 	constructor( name ) {
 		this._name = name;
 		this._domain = 'sgwm';
