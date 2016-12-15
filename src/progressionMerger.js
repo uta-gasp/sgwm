@@ -32,12 +32,6 @@ class ProgressionMerger {
                 logger.log( 'ProgressionMerger   ', ...params );
             };
         }
-
-        this.debug = {
-            joinSetsOfType: joinSetsOfType,
-            createPairs: createPairs,
-            findAndJoinClosestPair: findAndJoinClosestPair,
-        };
     }
 
     // Arguments:
@@ -273,6 +267,14 @@ function findAndJoinClosestPair( fixationsSets, pairs, forced ) {
 /**********************
     align
 **********************/
+function avgY( fixations ) {
+    let sumY = 0;
+    for (var i = 0; i < fixations.length; i += 1) {
+        sumY += fixations[i].y;
+    }
+    return sumY / fixations.length;
+}
+
 function sortLines( fixationLines ) {
     fixationLines.sort( (line1, line2) => {
         return avgY( line1 ) - avgY( line2 );
@@ -318,9 +320,8 @@ function align( fixationLines, interlineDistance ) {
 }
 
 /**********************
-    [other]
+    dropShortSets
 **********************/
-
 function dropShortSets( fixationSets, minLength ) {
     var result = [];
 
@@ -335,14 +336,6 @@ function dropShortSets( fixationSets, minLength ) {
     }
 
     return result;
-}
-
-function avgY( fixations ) {
-    let sumY = 0;
-    for (var i = 0; i < fixations.length; i += 1) {
-        sumY += fixations[i].y;
-    }
-    return sumY / fixations.length;
 }
 
 module.exports = ProgressionMerger;
