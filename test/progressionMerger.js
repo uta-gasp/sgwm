@@ -4,11 +4,12 @@ const ProgressionMerger = require('./../src/progressionMerger');
 const ProgressionMergerSettings = require('./../src/progressionMergerSettings');
 const TextModel = require('./../src/textModel');
 
-function Word( x, y, w, h ) {
+function Word( x, y, w, h, row ) {
 	this.x = x;
 	this.y = y;
 	this.width = w;
 	this.height = h;
+	this.row = row;
 }
 
 function addFixationIDs( progressions ) {
@@ -188,15 +189,15 @@ describe( 'ProgressionMerger', () => {
 	    addFixationIDs( progressions );
 
 		const words = [
-			new Word(100, 100, 90, 20),
-			new Word(200, 100, 90, 20),
-			new Word(300, 100, 90, 20),
-			new Word(100, 210, 90, 20),
-			new Word(200, 210, 90, 20),
-			new Word(300, 210, 110, 20),
-			new Word(100, 265, 90, 20),
-			new Word(200, 265, 90, 20),
-			new Word(300, 265, 90, 20),
+			new Word(100, 100, 90, 20, 1),
+			new Word(200, 100, 90, 20, 1),
+			new Word(300, 100, 90, 20, 1),
+			new Word(100, 210, 90, 20, 2),
+			new Word(200, 210, 90, 20, 2),
+			new Word(300, 210, 110, 20, 2),
+			new Word(100, 265, 90, 20, 3),
+			new Word(200, 265, 90, 20, 3),
+			new Word(300, 265, 90, 20, 3),
 		];
 
 		const text = new TextModel( words );
@@ -207,6 +208,56 @@ describe( 'ProgressionMerger', () => {
 	    assert.equal( readingLines.length, text.lines.length );
 
 	    //logger.log( readingLines );
+	    assert.equal( readingLines[0][0].line, 0, 'first reading line is not #0' );
+	    assert.equal( readingLines[1][0].line, 2, 'second reading line is not #2' );
+	    assert.equal( readingLines[2][0].line, 3, 'third reading line is not #3' );
+	});
+
+	it( 'should assign line ID = 0, 2, 3 as one line was skipped in reading', () =>  {
+	    const progressions = [
+		    [
+		    	{x: 150, y: 100, duration: 300},
+		    	{x: 200, y: 120, duration: 350},
+		    	{x: 250, y: 110, duration: 400},
+		    ],
+		    [
+		    	{x: 170, y: 220, duration: 300},
+		    	{x: 230, y: 210, duration: 300},
+		    	{x: 300, y: 220, duration: 300},
+		    	{x: 350, y: 210, duration: 300},
+		    ],
+		    [
+		    	{x: 140, y: 275, duration: 300},
+		    	{x: 230, y: 280, duration: 300},
+		    	{x: 300, y: 270, duration: 300},
+		    	{x: 350, y: 275, duration: 300},
+		    ],
+	    ];
+
+	    addFixationIDs( progressions );
+
+		const words = [
+			new Word(100, 100, 90, 20),
+			new Word(200, 100, 90, 20),
+			new Word(300, 100, 90, 20),
+			new Word(100, 155, 90, 20),
+			new Word(200, 155, 90, 20),
+			new Word(300, 155, 110, 20),
+			new Word(100, 210, 90, 20),
+			new Word(200, 210, 90, 20),
+			new Word(300, 210, 90, 20),
+			new Word(100, 265, 90, 20),
+			new Word(200, 265, 90, 20),
+			new Word(300, 265, 110, 20),
+		];
+
+		const text = new TextModel( words );
+
+	    const merger = new ProgressionMerger( text.interlineDistance, logger );
+
+	    const readingLines = merger.merge( progressions, text.lines.length );
+	    assert.equal( readingLines.length, text.lines.length - 1 );
+
 	    assert.equal( readingLines[0][0].line, 0, 'first reading line is not #0' );
 	    assert.equal( readingLines[1][0].line, 2, 'second reading line is not #2' );
 	    assert.equal( readingLines[2][0].line, 3, 'third reading line is not #3' );
