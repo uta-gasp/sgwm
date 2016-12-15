@@ -2,9 +2,8 @@ const assert = require('chai').assert;
 
 const SGWM = require('./../src/sgwm');
 
-const FarFixationFilterSettings = require('./../src/farFixationFilterSettings');
+const FixationProcessorSettings = require('./../src/fixationProcessorSettings');
 const ProgressionMergerSettings = require('./../src/progressionMergerSettings');
-const ShortFixationFilterSettings = require('./../src/shortFixationFilterSettings');
 const SplitToProgressionsSettings = require('./../src/splitToProgressionsSettings');
 const WordMapperSettings = require('./../src/wordMapperSettings');
 
@@ -33,10 +32,14 @@ describe( 'SGWM', () => {
 	};
 
     before(() => {
-    	let settings = new FarFixationFilterSettings();
-    	settings.enabled = true;
-    	settings.marginX = 100;
-    	settings.marginY = 150;
+    	let settings = new FixationProcessorSettings();
+    	settings.location.enabled = true;
+    	settings.location.marginX = 100;
+    	settings.location.marginY = 150;
+    	settings.duration.enabled = true;
+    	settings.duration.mergingDistanceThreshold = 40;
+    	settings.duration.mergingDurationThreshold = 150;
+    	settings.duration.removingDurationThreshold = 150;
     	settings.save();
 
     	settings = new ProgressionMergerSettings();
@@ -46,13 +49,6 @@ describe( 'SGWM', () => {
     	settings.removeSingleFixationLines = false;
     	settings.correctForEmptyLines = true;
     	settings.emptyLineDetectorFactor = 1.7;
-    	settings.save();
-
-    	settings = new ShortFixationFilterSettings();
-    	settings.enabled = true;
-    	settings.mergingDistanceThreshold = 40;
-    	settings.mergingDurationThreshold = 150;
-    	settings.removingDurationThreshold = 150;
     	settings.save();
 
     	settings = new SplitToProgressionsSettings();

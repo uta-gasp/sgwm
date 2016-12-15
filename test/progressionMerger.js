@@ -80,12 +80,17 @@ describe( 'ProgressionMerger', () => {
 
 	    addFixationIDs( progressions );
 
+	    const lines = [[], []].map( (line, i) => {
+	    	line.y = (i + 2) * 55;
+	    	return line;
+	    });
+
 	    const merger = new ProgressionMerger( interLineDistance, logger );
 
-	    const readingLines = merger.merge( progressions, 2 );
+	    const readingLines = merger.merge( progressions, lines );
 
-	    assert.equal( readingLines.length, 2, 'line count is not 2' );
-	    assert.equal( readingLines[0].joined, 2, 'first line is not made of 2 progressions' );
+	    assert.equal( readingLines.length, lines.length, 'line count is not 2' );
+	    assert.equal( readingLines[0].joined, 2, 'first line should be made of 2 progressions' );
 	    assert.sameDeepMembers( readingLines[0], progressions[0].concat( progressions[1] ), 'first line is not same as first 2 merged progressions' );
     	assert.sameDeepMembers( readingLines[1], progressions[2], 'line.1 !== progression.2' );
 	});
@@ -150,13 +155,18 @@ describe( 'ProgressionMerger', () => {
 
 	    addFixationIDs( progressions );
 
+	    const lines = [[], [], []].map( (line, i) => {
+	    	line.y = (i + 2) * 55;
+	    	return line;
+	    });
+
 	    const merger = new ProgressionMerger( interLineDistance, logger );
 
-	    const readingLines = merger.merge( progressions, 3 );
+	    const readingLines = merger.merge( progressions, lines );
 
 	    //logger.log( readingLines );
 
-	    assert.equal( readingLines.length, 3, 'line count is not 3' );
+	    assert.equal( readingLines.length, lines.length, 'line count is not 3' );
 	    assert.equal( readingLines[0].length, 11, 'first line does not contain 11 fixations' );
 	    assert.equal( readingLines[1].length, 6, 'second line does not contain 6 fixations' );
 	    assert.equal( readingLines[2].length, 8, 'third line does not contain 8 fixations'  );
@@ -204,13 +214,12 @@ describe( 'ProgressionMerger', () => {
 
 	    const merger = new ProgressionMerger( text.interlineDistance, logger );
 
-	    const readingLines = merger.merge( progressions, text.lines.length );
-	    assert.equal( readingLines.length, text.lines.length );
+	    const readingLines = merger.merge( progressions, text.lines );
 
-	    //logger.log( readingLines );
+	    assert.equal( readingLines.length, text.lines.length );
 	    assert.equal( readingLines[0][0].line, 0, 'first reading line is not #0' );
-	    assert.equal( readingLines[1][0].line, 2, 'second reading line is not #2' );
-	    assert.equal( readingLines[2][0].line, 3, 'third reading line is not #3' );
+	    assert.equal( readingLines[1][0].line, 1, 'second reading line is not #1' );
+	    assert.equal( readingLines[2][0].line, 2, 'third reading line is not #2' );
 	});
 
 	it( 'should assign line ID = 0, 2, 3 as one line was skipped in reading', () =>  {
@@ -255,9 +264,9 @@ describe( 'ProgressionMerger', () => {
 
 	    const merger = new ProgressionMerger( text.interlineDistance, logger );
 
-	    const readingLines = merger.merge( progressions, text.lines.length );
-	    assert.equal( readingLines.length, text.lines.length - 1 );
+	    const readingLines = merger.merge( progressions, text.lines );
 
+	    assert.equal( readingLines.length, text.lines.length - 1 );
 	    assert.equal( readingLines[0][0].line, 0, 'first reading line is not #0' );
 	    assert.equal( readingLines[1][0].line, 2, 'second reading line is not #2' );
 	    assert.equal( readingLines[2][0].line, 3, 'third reading line is not #3' );

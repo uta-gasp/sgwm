@@ -24,8 +24,6 @@ class ProgressionMerger {
         settings.load();
         settings.fitThreshold *= interlineDistance;
 
-        this._interlineDistance = interlineDistance;
-
         if (logger) {
             logger.log( '. . . . . . . . .' );
             log = (...params) => {
@@ -36,14 +34,16 @@ class ProgressionMerger {
 
     // Arguments:
     //   progressions (Array of (Array of Fixation))
-    //   lineCount (Integer): number of text lines
+    //   textLines (Array of (Array of word))
     // Returns:
     //   new sorted array of original and merged progressions (Array of (Array of Fixation))
     // Notes:
     //   1. Fixations get property "line", the index of line they land onto.
     //   2. Merged sets have property "joined" = <number of joined progressions>
     //   3. Progressions not included in the resulting array and not merged with other have property "removed"
-    merge( progressions, lineCount ) {
+    merge( progressions, textLines ) {
+        const lineCount = textLines.length;
+
         let result = progressions.map( set => set );
         log( '#0:', result.length, '\n', result.map( set => (set.map( fix => fix.id ))) );
 
@@ -80,7 +80,7 @@ class ProgressionMerger {
             log( '#3b:', result.length );
         }
 
-        align( result, this._interlineDistance );
+        align( result, textLines );
 
         return result;
     }
@@ -275,39 +275,51 @@ function avgY( fixations ) {
     return sumY / fixations.length;
 }
 
-function sortLines( fixationLines ) {
-    fixationLines.sort( (line1, line2) => {
-        return avgY( line1 ) - avgY( line2 );
+function sortSets( fixationsSets ) {
+    fixationsSets.sort( (set1, set2) => {
+        return avgY( set1 ) - avgY( set2 );
     });
-    fixationLines.forEach( line => {
-        line.sort( (fix1, fix2) => {
+    fixationsSets.forEach( set => {
+        set.sort( (fix1, fix2) => {
             return fix1.ts - fix2.ts;
         });
     });
 }
 
-function align( fixationLines, interlineDistance ) {
+function align( fixationsSets, textLines ) {
 
-    sortLines( fixationLines );
+    sortSets( fixationsSets );
 
     let currentLineID = 0;
-    let lastLineY = 0;
+    let lastSetY;
+    let lastLineY;
 
-    const minYDiffForLineCorrection = settings.emptyLineDetectorFactor * interlineDistance;
+    for (let i = 0; i < fixationsSets.length; i += 1) {
+        const fixations = fixationsSets[i];
+        const currentSetY = avgY( fixations );
+        let currentLineY = textLines[ currentLineID ].y;
 
-    for (let i = 0; i < fixationLines.length; i += 1) {
-        const fixations = fixationLines[i];
-        let currentLineY = 0;
-        for (let j = 0; j < fixations.length; j += 1) {
-            currentLineY += fixations[j].y;
+        const initialLineID = currentLineID;
+        if (i > 0) {
+            while (currentLineID < textLines.length) {
+                currentLineY = textLines[ currentLineID ].y;
+
+                const setDist = currentSetY - lastSetY;
+                const lineDist = currentLineY - lastLineY;
+
+                if (setDist < settings.emptyLineDetectorFactor * lineDist) {
+                    break;
+                }
+
+                currentLineID += 1;
+            }
+        }
+        else {
+            currentLineY = textLines[ currentLineID ].y;
         }
 
-        currentLineY /= fixations.length;
-
-        if (settings.correctForEmptyLines && i > 0 && (currentLineY - lastLineY) > minYDiffForLineCorrection) {
-            const origLineID = currentLineID;
-            currentLineID += Math.round( (currentLineY - lastLineY) / interlineDistance ) - 1;
-            log( `Correction: #${origLineID} => ${currentLineID}` );
+        if (initialLineID !== currentLineID) {
+            log( `Line advanced: #${initialLineID} => ${currentLineID}` );
         }
 
         for (let j = 0; j < fixations.length; j += 1) {
@@ -315,7 +327,14 @@ function align( fixationLines, interlineDistance ) {
         }
 
         lastLineY = currentLineY;
+        lastSetY = currentSetY;
+
         currentLineID += 1;
+        if (currentLineID >= textLines.length) {
+            break;
+        }
+
+        currentLineY = textLines[ currentLineID ].y;
     }
 }
 

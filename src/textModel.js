@@ -24,6 +24,7 @@ class TextModel {
         const createNewLine = function( word ) {
             currentLine = [ word ];
             currentLine.id = word.row === undefined ? lines.length : word.row - 1;
+            currentLine.y = word.y;
             lines.push( currentLine );
         };
 
@@ -67,12 +68,12 @@ function getInterlineDistance( lines ) {
     if (lines.length > 1) {
         const interlineDists = [];
         for (let i = 1; i < lines.length; i += 1) {
-            interlineDists.push( lines[i][0].y - lines[i - 1][0].y );
+            interlineDists.push( lines[i].y - lines[i - 1].y );
         }
         interlineDist = median( interlineDists );
         /*/
         for (let i = 1; i < textLines.length; i += 1) {
-            interlineDist += textLines[i][0].y - textLines[i - 1][0].y;
+            interlineDist += textLines[i].y - textLines[i - 1].y;
         }
         interlineDist = interlineDist / (textLines.length - 1);
         */

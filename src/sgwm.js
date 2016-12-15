@@ -9,9 +9,8 @@ const TextModel = require('./textModel');
 const ProgressionMerger = require('./progressionMerger');
 const WordMapper = require('./wordMapper');
 
-const FarFixationFilterSettings = require('./farFixationFilterSettings');
+const FixationProcessorSettings = require('./fixationProcessorSettings');
 const ProgressionMergerSettings = require('./progressionMergerSettings');
-const ShortFixationFilterSettings = require('./shortFixationFilterSettings');
 const SplitToProgressionsSettings = require('./splitToProgressionsSettings');
 const WordMapperSettings = require('./wordMapperSettings');
 
@@ -46,7 +45,7 @@ class SGWM {
     	const progressions = splitToProgressions( fixations, text.lineHeight, text.interlineDistance );
 
 		const merger = new ProgressionMerger( text.interlineDistance, this.logger );
-    	const fixationLines = merger.merge( progressions, text.lines.length );
+    	const fixationLines = merger.merge( progressions, text.lines );
 
 	    const wordMapper = new WordMapper( this.logger );
 	    wordMapper.map( fixationLines, text.lines );
@@ -55,9 +54,8 @@ class SGWM {
     	return { fixations, text };
     }
 
-    static get FarFixationFilterSettings() { return FarFixationFilterSettings; }
+    static get FixationProcessorSettings() { return FixationProcessorSettings; }
     static get ProgressionMergerSettings() { return ProgressionMergerSettings; }
-    static get ShortFixationFilterSettings() { return ShortFixationFilterSettings; }
     static get SplitToProgressionsSettings() { return SplitToProgressionsSettings; }
     static get WordMapperSettings() { return WordMapperSettings; }
 }
