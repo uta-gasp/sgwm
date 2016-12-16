@@ -129,7 +129,7 @@ function rescaleFixations( fixations, words ) {
     const lastWord = words[ words.length - 1 ];
 
     const leftThreshold = firstWord.x + firstWord.width;
-    const rightThreshold = lastWord.fixations && lastWord.fixations.length === 1 ? lastWord.x : lastWord.x + lastWord.width;
+    const rightThreshold = lastWord.x + lastWord.width;
 
     let { leftMostX, rightMostX } = getFixationsRange( fixations );
 
