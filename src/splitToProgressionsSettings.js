@@ -6,12 +6,12 @@ class ProgressionSplitterSettings extends Settings {
 	constructor() {
 		super( 'progressionSplitterSettings' );
 		this._bounds = {
-			left: -2,
-			right: 20,
+			left: -0.5,
+			right: 10,
 			verticalChar: 1.5,	// in characters
-			verticalLine: 0.7,	// in interline distances
+			verticalLine: 0.65,	// in interline distances
 		};
-		this._angle = Math.sin( 10 * Math.PI / 180 );
+		this._angle = Math.sin( 15 * Math.PI / 180 );
 
 		super.load();
 	}
@@ -30,7 +30,8 @@ class ProgressionSplitterSettings extends Settings {
 		return {
 			left: this._bounds.left * lineHeight,
 			right: this._bounds.right * lineHeight,
-			vertical: dx => vertical + dx * this._angle
+			vertical: dx => vertical + dx * this._angle,
+			_vertical: vertical
 		};
 	}
 }

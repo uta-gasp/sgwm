@@ -14,13 +14,17 @@ const SET_TYPE = {
     ANY: 3
 };
 
+let interlineDistance = 30;
+
 let log = () => {}; // Function( module, ...messages )
 
 class ProgressionMerger {
     // Arguments:
     //   interlineDistance (Number): inter-line distance in pixels
     //   logger ({ log(...) }): optional logger
-    constructor( interlineDistance, logger ) {
+    constructor( _interlineDistance, logger ) {
+        interlineDistance = _interlineDistance;
+
         settings.load();
         settings.fitThreshold *= interlineDistance;
 
@@ -269,7 +273,7 @@ function findAndJoinClosestPair( fixationsSets, pairs, forced ) {
 **********************/
 function avgY( fixations ) {
     let sumY = 0;
-    for (var i = 0; i < fixations.length; i += 1) {
+    for (let i = 0; i < fixations.length; i += 1) {
         sumY += fixations[i].y;
     }
     return sumY / fixations.length;
@@ -290,17 +294,29 @@ function align( fixationsSets, textLines ) {
 
     sortSets( fixationsSets );
 
+    let minID = Number.MAX_VALUE;
+    let maxID = 0;
+    textLines.forEach( line => {
+        if (minID > line.id) {
+            minID = line.id;
+        }
+        if (maxID < line.id) {
+            maxID = line.id;
+        }
+    });
+
     let currentLineID = 0;
     let lastSetY;
-    let lastLineY;
+    // let lastLineY;
 
     for (let i = 0; i < fixationsSets.length; i += 1) {
         const fixations = fixationsSets[i];
         const currentSetY = avgY( fixations );
-        let currentLineY = textLines[ currentLineID ].y;
+        // let currentLineY;
 
         const initialLineID = currentLineID;
-        if (i > 0) {
+        if (settings.correctForEmptyLines && i > 0) {
+            /*
             while (currentLineID < textLines.length) {
                 currentLineY = textLines[ currentLineID ].y;
 
@@ -313,10 +329,31 @@ function align( fixationsSets, textLines ) {
 
                 currentLineID += 1;
             }
+            */
+            const lineIDsFromMappedSets = [];
+            for (let j = 0; j < i; j += 1) {
+                const prevSet = fixationsSets[j];
+                if (prevSet[0].line === undefined) {
+                    continue;
+                }
+
+                const prevSetY = avgY( prevSet );
+                lineIDsFromMappedSets.push( prevSet[0].line + (currentSetY - prevSetY) / interlineDistance );
+            }
+
+            if (lineIDsFromMappedSets.length) {
+                const avgID = lineIDsFromMappedSets.reduce( (acc, id) => {
+                    return acc + id;
+                }, 0 ) / lineIDsFromMappedSets.length;
+                currentLineID = Math.min( maxID, Math.max( minID, Math.round( avgID ) ) );
+            }
+            else {
+                currentLineID += 1;
+            }
         }
-        else {
-            currentLineY = textLines[ currentLineID ].y;
-        }
+        // else {
+        //     currentLineY = textLines[ currentLineID ].y;
+        // }
 
         if (initialLineID !== currentLineID) {
             log( `Line advanced: #${initialLineID} => ${currentLineID}` );
@@ -326,16 +363,20 @@ function align( fixationsSets, textLines ) {
             fixations[j].line = currentLineID;
         }
 
-        lastLineY = currentLineY;
+        // lastLineY = currentLineY;
         lastSetY = currentSetY;
 
         currentLineID += 1;
-        if (currentLineID >= textLines.length) {
-            break;
-        }
+        // if (currentLineID >= textLines.length) {
+        //     break;
+        // }
 
-        currentLineY = textLines[ currentLineID ].y;
+        // currentLineY = textLines[ currentLineID ].y;
     }
+// fixationsSets.forEach( (p, pi) => {
+//     console.log('--',pi,'--');
+//     console.log( p.map( (f, fi) => { return f.line; } ).join(' ') ) ;
+// });
 }
 
 /**********************

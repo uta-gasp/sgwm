@@ -48,7 +48,9 @@ Make changes, then test that mapping work at least not worse that it was:
 
 Write more tests to check the new functionality.
 
-Build it by launching
+### Building for Web
+
+Run
 
     webpack
 
@@ -63,5 +65,12 @@ Ensure that library is valid by running the static server:
     npm install -g node-static
     static
 
-and opening the file `test/sgwm.html` in a browser: you should see 'success' message.
+in the project root folder and opening the file `127.0.0.1:8080/test/sgwm.html` in a browser: all tests should have 'success' text.
 
+### Building for NodeJS
+
+If you need to build the CommonJS module (say, to use in NodeJS app), then add `TYPE=node` before `webpack`:
+
+    [NODE_ENV=production] TYPE=node webpack 
+
+This will create `build/sgwm.module.js` or `build/sgwm.module.min.js` file.

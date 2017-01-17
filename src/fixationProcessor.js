@@ -67,7 +67,7 @@ class FixationProcessor {
         } while (result.length !== fixationCount);
 
         return result;
-    };
+    }
 }
 
 // Calculated distance between 2 fixations

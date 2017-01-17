@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="status" class="panel"></div>
-		<script src="build/sgwm.js"></script>
+		<script src="build/sgwm.min.js"></script>
 		<script>
 			function test( className, cb ) {
 				let ok;
@@ -38,7 +38,9 @@
 				document.querySelector( '#status' ).appendChild( msg );
 			}
 
-			test( 'SGWM' );
+			test( 'SGWM', sgwm => {
+				return sgwm.map !== undefined;
+			});
 
 			const fffSettings = new SGWM.FarFixationFilterSettings();
 			fffSettings.marginX = 111;

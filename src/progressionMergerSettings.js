@@ -7,7 +7,7 @@ class ProgressionMergerSettings extends Settings {
 		super( 'progressionMergerSettings' );
 
 		this._minLongSetLength = 3; 	// the minimal length of "long" set
-		this._fitThreshold = 0.7;		// fraction of the average inter-line distance
+		this._fitThreshold = 0.3;		// fraction of the average inter-line distance
 		this._maxLinearGradient = 0.15; // the maximum difference in equation gradients for fixations that can be joined
 		this._removeSingleFixationLines = false;
 		this._correctForEmptyLines = true;

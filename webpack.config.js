@@ -3,14 +3,19 @@
 const webpack = require( 'webpack' );
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
+const TYPE = process.env.TYPE || 'lib';
 const isDev = NODE_ENV === 'development';
+const suffix = (TYPE === 'lib' ?  '' : '.module') +
+				(isDev ? '' : '.min') +
+				'.js'
 
 module.exports = {
 	context: __dirname + '/src',
 	entry: './sgwm.js',
 	output: {
 		path: __dirname + '/build',
-		filename: isDev ? 'sgwm.js' : 'sgwm.min.js',
+		filename: 'sgwm' + suffix,
+		libraryTarget: TYPE === 'lib' ? 'var' : 'commonjs2',
 		library: 'SGWM'
 	},
 
@@ -43,7 +48,7 @@ module.exports = {
 
 if (isDev) {
 	module.exports.module.loaders.push({
-		test: /\.js$/, loader: "jshint-loader", exclude: /node_modules/
+		test: /\.js$/, loader: 'jshint-loader', exclude: /node_modules/
 	});
 	module.exports.jshint = {
 		esversion: 6,
