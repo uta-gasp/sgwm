@@ -11,6 +11,7 @@ class WordMapperSettings extends Settings {
 		this._rescaleFixationX = true;
 		this._partialLengthMaxWordLength = 2;
 		this._effectiveLengthFactor = 0.7;
+		this._ignoreTransitions = true;
 
 		super.load();
 	}
@@ -27,6 +28,8 @@ class WordMapperSettings extends Settings {
 	set partialLengthMaxWordLength( value ) { this._partialLengthMaxWordLength = value; }
 	get effectiveLengthFactor() { return this._effectiveLengthFactor; }
 	set effectiveLengthFactor( value ) { this._effectiveLengthFactor = value; }
+	get ignoreTransitions() { return this._ignoreTransitions; }
+	set ignoreTransitions( value ) { this._ignoreTransitions = value; }
 }
 
 module.exports = WordMapperSettings;

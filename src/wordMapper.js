@@ -52,7 +52,9 @@ class WordMapper {
     //   fixations (Array of Fixation): the list of fixations
     //   words (Array of Word): the Text.words
     clean( fixations, words ) {
-        removeTransitions( fixations, words );
+        if (settings.ignoreTransitions) {
+            removeTransitions( fixations, words );
+        }
     }
 }
 
