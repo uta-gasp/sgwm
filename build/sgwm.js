@@ -313,20 +313,23 @@ var SGWM =
 		constructor( name ) {
 			this._name = name;
 			this._domain = 'sgwm';
+			this._isInitialized = false;
 	
 			this._fullPath = function( name ) {
-				return [ this._domain, this._name, name ].join( '_' );
+				return [ this._name, name ].join( '_' );
 			};
 		}
 	
 		load() {
 			const hiddenProps = Object.keys(new Settings(''));
+			const allSettings = JSON.parse( localStorage.getItem( this._domain ) );
+			this._isInitialized = allSettings && allSettings[ this._name ];
 	
 			for (let p in this) {
 				if (hiddenProps.indexOf( p ) > -1) {
 					continue;
 				}
-				const value = JSON.parse( localStorage.getItem( this._fullPath( p ) ) );
+				const value = allSettings ? allSettings[ this._fullPath( p ) ] : null;
 				if (value !== null) {
 					this[p] = value;
 				}
@@ -335,14 +338,19 @@ var SGWM =
 	
 		save() {
 			const hiddenProps = Object.keys(new Settings(''));
+			const allSettings = JSON.parse( localStorage.getItem( this._domain ) ) || {};
 	
 			for (let p in this) {
 				if (hiddenProps.indexOf( p ) > -1) {
 					continue;
 				}
-				localStorage.setItem( this._fullPath( p ), JSON.stringify( this[p] ) );
+				allSettings[ this._fullPath( p ) ] = this[p];
 			}
+	
+			localStorage.setItem( this._domain, JSON.stringify( allSettings ) );
 		}
+	
+		get isInitialized() { return this._isInitialized; }
 	}
 	
 	module.exports = Settings;

@@ -19,7 +19,7 @@ module.exports = {
 		library: 'SGWM'
 	},
 
-	watch: isDev,
+	watch: false,
 	watchOptions: {
 		aggregateTimeout: 100
 	},
