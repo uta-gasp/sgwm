@@ -78,7 +78,10 @@ class ProgressionMerger {
             // drop short sets
             result = dropShortSets( result, settings.minLongSetLength );
             log( '#3a:', result.length );
+        // }
 
+        // if (result.length > lineCount) {
+            // and still too many...
             // then force joining the closest sets
             result = joinSetsOfType( result, lineCount, SET_TYPE.ANY, SET_TYPE.ANY );
             log( '#3b:', result.length );
@@ -290,22 +293,57 @@ function sortSets( fixationsSets ) {
     });
 }
 
+function computeRange( set, getValue ) {
+    if (!set) {
+        return { min: 0, max: 0, range: 0 };
+    }
+
+    let min = Number.MAX_SAFE_INTEGER;
+    let max = Number.MIN_SAFE_INTEGER;
+    set.forEach( fixation => {
+        const value = getValue( fixation );
+        if (min > value) {
+            min = value;
+        }
+        if (max < value) {
+            max = value;
+        }
+    });
+
+    return { min, max, range: max - min };
+}
+
+function getInitialLine( fixationsSets, textLines ) {
+    if (!settings.intelligentFirstLineMapping || textLines.length < 2) {
+        return 0;
+    }
+
+    const firstSetLength = computeRange( fixationsSets[0], fixation => fixation.x ).range;
+    const lineLengths = [];
+    textLines.forEach( line => {
+        lineLengths.push( computeRange( line, word => word.x ).range + line[ line.length - 1 ].width );
+    });
+
+    let lineID = 0;
+
+    let ratio = lineLengths[ lineID ] / firstSetLength;
+    let threshold = lineLengths[ lineID ] / lineLengths[ lineID + 1 ];
+    while (threshold < 0.7 && ratio < ((threshold + 1) / 2) && lineID <= lineLengths.length / 2 ) {
+        lineID++;
+        ratio = lineLengths[ lineID ] / firstSetLength;
+        threshold = lineLengths[ lineID ] / lineLengths[ lineID + 1 ];
+    }
+
+    return lineID;
+}
+
 function align( fixationsSets, textLines ) {
 
     sortSets( fixationsSets );
 
-    let minID = Number.MAX_VALUE;
-    let maxID = 0;
-    textLines.forEach( line => {
-        if (minID > line.id) {
-            minID = line.id;
-        }
-        if (maxID < line.id) {
-            maxID = line.id;
-        }
-    });
+    const { min: minID, max: maxID } = computeRange( textLines, line => line.id );
 
-    let currentLineID = 0;
+    let currentLineID = getInitialLine( fixationsSets, textLines );
     let lastSetY;
     // let lastLineY;
 
@@ -342,9 +380,10 @@ function align( fixationsSets, textLines ) {
             }
 
             if (lineIDsFromMappedSets.length) {
-                const avgID = lineIDsFromMappedSets.reduce( (acc, id) => {
-                    return acc + id;
-                }, 0 ) / lineIDsFromMappedSets.length;
+                let avgID = lineIDsFromMappedSets.reduce( (acc, id) => (acc + id), 0 ) / lineIDsFromMappedSets.length;
+                if (avgID < currentLineID) {
+                    avgID += settings.currentLineSupportInCorrection;   // if between prev and current line, then support more the current line, thatn the previous
+                }
                 currentLineID = Math.min( maxID, Math.max( minID, Math.round( avgID ) ) );
             }
             else {
@@ -382,12 +421,32 @@ function align( fixationsSets, textLines ) {
 /**********************
     dropShortSets
 **********************/
-function dropShortSets( fixationSets, minLength ) {
-    var result = [];
+function dropShortestSet( fixationSets, minSetLength ) {
+    const shortest = fixationSets.reduce(( acc, set, index ) => {
+        if (set.length < acc.length) {
+            return {
+                index: index,
+                length: acc.length
+            };
+        }
+        else {
+            return acc;
+        }
+    }, {index: -1, length: 100} );
 
-    for (var i = 0; i < fixationSets.length; i += 1) {
-        var fixationSet = fixationSets[i];
-        if (fixationSet.length >= minLength) {
+    if (shortest.index >= 0 && shortest.length < minSetLength) {
+        fixationSets.splice( shortest.index, 1 );
+    }
+
+    return fixationSets;
+}
+
+function dropAllShortSets( fixationSets, minSetLength ) {
+    const result = [];
+
+    for (let i = 0; i < fixationSets.length; i += 1) {
+        const fixationSet = fixationSets[i];
+        if (fixationSet.length >= minSetLength) {
             result.push( fixationSet );
         }
         else {
@@ -396,6 +455,23 @@ function dropShortSets( fixationSets, minLength ) {
     }
 
     return result;
+}
+
+function dropShortSets( fixationSets, minSetLength, minSetsCount ) {
+    if (minSetsCount === undefined) {
+        return dropAllShortSets( fixationSets, minSetLength );
+    }
+    else {
+        let result = fixationSets;
+        while (result.length > minSetsCount ) {
+            const shortened = dropShortestSet( result, minSetLength );
+            if (shortened.length === result.length) {
+                break;
+            }
+            result = shortened;
+        }
+        return result;
+    }
 }
 
 module.exports = ProgressionMerger;

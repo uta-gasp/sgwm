@@ -20,6 +20,12 @@ class ProgressionSplitterSettings extends Settings {
 	set bounds( value ) { this._bounds = value; }
 	get angle() { return this._angle; }
 	set angle( value ) { this._angle = value; }
+	get left() { return this._bounds.left; }
+	set left( value ) { this._bounds.left = value; }
+	get right() { return this._bounds.right; }
+	set right( value ) { this._bounds.right = value; }
+	get verticalLine() { return this._bounds.verticalLine; }
+	set verticalLine( value ) { this._bounds.verticalLine = value; }
 
 	pixelBounds( lineHeight, interlineDistance ) {
 		const vertical = Math.min(

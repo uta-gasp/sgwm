@@ -11,7 +11,9 @@ class ProgressionMergerSettings extends Settings {
 		this._maxLinearGradient = 0.15; // the maximum difference in equation gradients for fixations that can be joined
 		this._removeSingleFixationLines = false;
 		this._correctForEmptyLines = true;
+		this._currentLineSupportInCorrection = 0.0;
 		this._emptyLineDetectorFactor = 1.7;	// multiplier to interlineDistance
+		this._intelligentFirstLineMapping = false;	// if false, then it  assumes the reading always start from the first line
 
 		super.load();
 	}
@@ -26,8 +28,12 @@ class ProgressionMergerSettings extends Settings {
 	set removeSingleFixationLines( value ) { this._removeSingleFixationLines = value; }
 	get correctForEmptyLines() { return this._correctForEmptyLines; }
 	set correctForEmptyLines( value ) { this._correctForEmptyLines = value; }
+	get currentLineSupportInCorrection() { return this._currentLineSupportInCorrection; }
+	set currentLineSupportInCorrection( value ) { this._currentLineSupportInCorrection = value; }
 	get emptyLineDetectorFactor() { return this._emptyLineDetectorFactor; }
 	set emptyLineDetectorFactor( value ) { this._emptyLineDetectorFactor = value; }
+	get intelligentFirstLineMapping() { return this._intelligentFirstLineMapping; }
+	set intelligentFirstLineMapping( value ) { this._intelligentFirstLineMapping = value; }
 }
 
 module.exports = ProgressionMergerSettings;

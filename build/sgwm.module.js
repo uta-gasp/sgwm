@@ -439,6 +439,12 @@ module.exports =
 		set bounds( value ) { this._bounds = value; }
 		get angle() { return this._angle; }
 		set angle( value ) { this._angle = value; }
+		get left() { return this._bounds.left; }
+		set left( value ) { this._bounds.left = value; }
+		get right() { return this._bounds.right; }
+		set right( value ) { this._bounds.right = value; }
+		get verticalLine() { return this._bounds.verticalLine; }
+		set verticalLine( value ) { this._bounds.verticalLine = value; }
 	
 		pixelBounds( lineHeight, interlineDistance ) {
 			const vertical = Math.min(
@@ -658,7 +664,10 @@ module.exports =
 	            // drop short sets
 	            result = dropShortSets( result, settings.minLongSetLength );
 	            log( '#3a:', result.length );
+	        // }
 	
+	        // if (result.length > lineCount) {
+	            // and still too many...
 	            // then force joining the closest sets
 	            result = joinSetsOfType( result, lineCount, SET_TYPE.ANY, SET_TYPE.ANY );
 	            log( '#3b:', result.length );
@@ -870,22 +879,53 @@ module.exports =
 	    });
 	}
 	
+	function computeRange( set, getValue ) {
+	    let min = Number.MAX_SAFE_INTEGER;
+	    let max = Number.MIN_SAFE_INTEGER;
+	    set.forEach( fixation => {
+	        const value = getValue( fixation );
+	        if (min > value) {
+	            min = value;
+	        }
+	        if (max < value) {
+	            max = value;
+	        }
+	    });
+	
+	    return { min, max, range: max - min };
+	}
+	
+	function getInitialLine( fixationsSets, textLines ) {
+	    if (!settings.intelligentFirstLineMapping || textLines.length < 2) {
+	        return 0;
+	    }
+	
+	    const firstSetLength = computeRange( fixationsSets[0], fixation => fixation.x ).range;
+	    const lineLengths = [];
+	    textLines.forEach( line => {
+	        lineLengths.push( computeRange( line, word => word.x ).range + line[ line.length - 1 ].width );
+	    });
+	
+	    let lineID = 0;
+	
+	    let ratio = lineLengths[ lineID ] / firstSetLength;
+	    let threshold = lineLengths[ lineID ] / lineLengths[ lineID + 1 ];
+	    while (threshold < 0.7 && ratio < ((threshold + 1) / 2) && lineID <= lineLengths.length / 2 ) {
+	        lineID++;
+	        ratio = lineLengths[ lineID ] / firstSetLength;
+	        threshold = lineLengths[ lineID ] / lineLengths[ lineID + 1 ];
+	    }
+	
+	    return lineID;
+	}
+	
 	function align( fixationsSets, textLines ) {
 	
 	    sortSets( fixationsSets );
 	
-	    let minID = Number.MAX_VALUE;
-	    let maxID = 0;
-	    textLines.forEach( line => {
-	        if (minID > line.id) {
-	            minID = line.id;
-	        }
-	        if (maxID < line.id) {
-	            maxID = line.id;
-	        }
-	    });
+	    const { min: minID, max: maxID } = computeRange( textLines, line => line.id );
 	
-	    let currentLineID = 0;
+	    let currentLineID = getInitialLine( fixationsSets, textLines );
 	    let lastSetY;
 	    // let lastLineY;
 	
@@ -922,9 +962,7 @@ module.exports =
 	            }
 	
 	            if (lineIDsFromMappedSets.length) {
-	                const avgID = lineIDsFromMappedSets.reduce( (acc, id) => {
-	                    return acc + id;
-	                }, 0 ) / lineIDsFromMappedSets.length;
+	                const avgID = lineIDsFromMappedSets.reduce( (acc, id) => (acc + id), 0 ) / lineIDsFromMappedSets.length;
 	                currentLineID = Math.min( maxID, Math.max( minID, Math.round( avgID ) ) );
 	            }
 	            else {
@@ -1271,6 +1309,7 @@ module.exports =
 			this._removeSingleFixationLines = false;
 			this._correctForEmptyLines = true;
 			this._emptyLineDetectorFactor = 1.7;	// multiplier to interlineDistance
+			this._intelligentFirstLineMapping = false;	// if false, then it  assumes the reading always start from the first line
 	
 			super.load();
 		}
@@ -1287,6 +1326,8 @@ module.exports =
 		set correctForEmptyLines( value ) { this._correctForEmptyLines = value; }
 		get emptyLineDetectorFactor() { return this._emptyLineDetectorFactor; }
 		set emptyLineDetectorFactor( value ) { this._emptyLineDetectorFactor = value; }
+		get intelligentFirstLineMapping() { return this._intelligentFirstLineMapping; }
+		set intelligentFirstLineMapping( value ) { this._intelligentFirstLineMapping = value; }
 	}
 	
 	module.exports = ProgressionMergerSettings;
