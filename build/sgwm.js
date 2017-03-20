@@ -1,4 +1,4 @@
-module.exports =
+var SGWM =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -1740,4 +1740,4 @@ module.exports =
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=sgwm.module.js.map
+//# sourceMappingURL=sgwm.js.map
